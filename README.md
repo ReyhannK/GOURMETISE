@@ -16,3 +16,13 @@ Projet Gourmetise SIO2024
     - Exécuter la migration :  
     	- exécuter la commande *php bin/console make:migration*
       
+
+- **GourmetiseVue**
+    - Pré-requis : Node 22.11.0 / Npm 10.9.0
+    - installer les dépendances :  
+        - exécuter la commande *npm install*
+    - Configuration de l'API :
+      - Créer un fichier *.env* à la racine du projet
+      - Ajouter la ligne suivante : *VITE_API_URL=[URL_API]*
+    - Lancer le serveur de développement :
+        - exécuter la commande *npm run dev*
