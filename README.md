@@ -3,7 +3,8 @@ Projet Gourmetise SIO2024
 
 - **Structure du projet**  
     - Doc : documentation du projet (Diagramme de classes,...)
-    - GourmetiseAPI : API du projet crééé avec Symfony  
+    - GourmetiseAPI : API du projet crééé avec Symfony
+    - GourmetiseVue : application web
 
 
 - **GourmetiseAPI**
