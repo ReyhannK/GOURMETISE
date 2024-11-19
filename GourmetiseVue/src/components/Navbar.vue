@@ -1,5 +1,5 @@
 <template>
-  <v-app-bar app color="primary" dark>
+  <v-app-bar app color="red" dark>
     <v-row align="center" class="flex-grow-1">
       <v-col class="d-flex" cols="auto">
         <img src="../assets/logo.png" alt="Logo La Gourmetise" class="logo"/>
@@ -49,4 +49,6 @@ a {
 img {
   max-height: 65px;
 }
+
+
 </style>

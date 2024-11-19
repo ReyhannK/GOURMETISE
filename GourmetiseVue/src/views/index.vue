@@ -8,6 +8,7 @@
           Participez au concours de la meilleure boulangerie organisé par La Gourmetise
           et découvrez les talents de la boulangerie dans votre région.
         </p>
+        <v-btn class="mt-10" color="red" to="/contestParams">En savoir plus</v-btn>
       </v-col>
     </v-row>
     <v-row class="text-center" justify="center">
@@ -44,5 +45,9 @@
 .my-12 {
   margin-top: 3rem;
   margin-bottom: 3rem;
+}
+
+.mt-10 {
+  margin-top: 2rem;
 }
 </style>
