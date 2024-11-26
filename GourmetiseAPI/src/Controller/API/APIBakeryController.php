@@ -12,6 +12,7 @@ use App\Entity\User;
 use App\Repository\BakeryRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Serializer\SerializerInterface;
+use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 
 class APIBakeryController extends AbstractController
 {
@@ -28,27 +29,43 @@ class APIBakeryController extends AbstractController
 
             if(empty($bakery->getSiret()) || empty($bakery->getName()) || empty($bakery->getStreet()) || empty($bakery->getPostalCode()) ||
                 empty($bakery->getCity()) || empty($bakery->getTelephoneNumber()) || empty($bakery->getContactName())
-                || empty($bakery->getBakeryDescription()) || empty($bakery->getProductsDecription()) || empty($bakery->getConsentDate()) 
+                || empty($bakery->getBakeryDescription()) || empty($bakery->getProductsDecription())
                 || empty($bakery->getUser()->getEmail()) 
             ){
-                return $this->json('Bakery not complet', Response::HTTP_CREATED);
+                return new JsonResponse(["message" => "Les informations de la boulangerie ne sont pas complètes."], Response::HTTP_BAD_REQUEST);
             }
 
             $user = $entityManager->getRepository(User::class)->findOneBy(['email' => $bakery->getUser()->getEmail()]);
             if(!$user)
             {
-                return $this->json('User does not exist', Response::HTTP_CREATED);
+                return new JsonResponse(["message" => "Vous n'avez pas de compte."], Response::HTTP_BAD_REQUEST);
             }
             $bakery->setUser($user);
+            $bakery->setConsentDate(new \DateTimeImmutable());
             
             $entityManager->persist($bakery);
             $entityManager->flush();
 
-            return $this->json('Bakery created', Response::HTTP_CREATED);
+            return new JsonResponse(["message" => "Boulangerie inscrite avec succès ! "], Response::HTTP_CREATED);
+        }
+        catch (UniqueConstraintViolationException $e) {
+           // echo "Message d'erreur: " . $e->getMessage();  
+
+            if (preg_match('/Duplicate entry.*for key \'bakery.PRIMARY\'/', $e->getMessage())) {
+                // Le SIRET est dupliqué
+                return new JsonResponse(["message" => "Numéro de siret déjà existant, cette boulangerie est déjà inscrite."], Response::HTTP_CONFLICT);
+            } elseif (preg_match('/Duplicate entry.*for key \'bakery.UNIQ/', $e->getMessage())) {
+                // L'email est dupliqué
+                return new JsonResponse(["message" => "Vous avez déjà inscrit une boulangerie avec ce compte."], Response::HTTP_CONFLICT);
+            }
+
+            // Si une violation de contrainte d'unicité inconnue se produit
+            return new JsonResponse(["message" => "Cette boulangerie est déjà inscrite ou vous avez déjà inscrite une boulangerie avec ce compte."], Response::HTTP_CONFLICT);
         } 
         catch (\Exception $e) {
+            //toutes les autres types d'erreurs
             echo $e->getMessage();
-            return $this->json ('Error creation Bakery', Response::HTTP_BAD_REQUEST);
+            return new JsonResponse(["message" => "Erreur lors de l\'inscription de la boulangerie."], Response::HTTP_CONFLICT);
         }
     }
 }

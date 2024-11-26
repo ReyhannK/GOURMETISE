@@ -98,6 +98,30 @@
         Valider
       </v-btn>
     </form>
+
+    <div class="text-center pa-4">
+      <v-dialog
+        v-model="modal"
+        width="auto"
+      >
+        <v-card
+          max-width="400"
+          :prepend-icon="error == true ? 'mdi-alert' : 'mdi-check'"
+          :text="modal"
+          :title="error == true ? 'Erreur' : 'Succès'"
+        >
+          <template v-slot:actions>
+            <v-btn
+              class="ms-auto"
+              text="Ok"
+              @click="modal=null, error=null"
+              color="black"
+            ></v-btn>
+          </template>
+        </v-card>
+      </v-dialog>
+    </div>
+    
   </v-container>
 </template>
 
@@ -127,6 +151,10 @@ const contact_nameError = ref(false);
 const bakery_descriptionError = ref(false);
 const products_decriptionError= ref(false);
 const checkboxError = ref(false);
+
+//var pour la modale d'affichage
+const modal = ref(false);
+const error = ref(null);
 
 //Formatage su numéro siret + téléphone
 const siretFormat = () => {
@@ -191,7 +219,6 @@ const validCheckBox = () => {
   return checkboxError.value = !checkbox.value;
 };
 
-//fonction qui verifie que TOUS les champs sont bons
 const valideForm = () => {
   return !(validSiret() || validName() || validStreet() || validCode_postal() || validCity()
     || validTelephone_number() || validContact_name() || validBakery_description() ||
@@ -199,12 +226,12 @@ const valideForm = () => {
   );
 };
 
-//Logique de validation de formulaire
-
 async function submit()
   {
     if(!valideForm())
     {
+      error.value = true;
+      modal.value = "Formulaire incomplet ou incorrect.";
       return;
     }
     try{
@@ -218,15 +245,23 @@ async function submit()
           "contact_name": contact_name.value,
           "bakery_description": bakery_description.value,
           "products_decription": products_decription.value,
-          "consent_date": new Date().toISOString(),
           "user" : {
             "email": "test@gmail.com"
           }
         }
         const response = await axios.post(import.meta.env.VITE_API_URL+"/api/bakeries", newBakery);
-        
+        error.value = false;
+        modal.value = response.data.message;
     }catch(error){
-        console.log('Erreur lors de l\'inscripton de la boulangerie',error);
+        if (error.response && error.response.data.message) {
+          error.value = true;
+          modal.value = error.response.data.message;
+        } 
+        else{
+          error.value = true;
+          modal.value = 'Erreur lors de l\'inscripton de la boulangerie';
+        }
+        
     }
   }
 
