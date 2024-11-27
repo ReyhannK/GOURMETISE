@@ -16,6 +16,16 @@ class ContestParamsRepository extends ServiceEntityRepository
         parent::__construct($registry, ContestParams::class);
     }
 
+    public function findLastContestParams(): ?ContestParams
+    {
+        $lastId = $this->createQueryBuilder('a')
+            ->select('MAX(a.id)')
+            ->getQuery()
+            ->getSingleScalarResult();
+
+        return $this->find($lastId);
+    }
+
 //    /**
 //     * @return ContestParams[] Returns an array of ContestParams objects
 //     */

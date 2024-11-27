@@ -2,7 +2,7 @@
   <v-app-bar app color="red" dark>
     <v-row align="center" class="flex-grow-1">
       <v-col class="d-flex" cols="auto">
-        <img src="../assets/logo.png" alt="Logo La Gourmetise" class="logo"/>
+        <img src="../assets/logo.png" alt="Logo La Gourmetise" class="logo" />
       </v-col>
 
       <v-col class="d-flex" cols="auto">
@@ -33,7 +33,6 @@
 </template>
 
 <script setup>
-
 </script>
 
 <style scoped>
@@ -49,6 +48,4 @@ a {
 img {
   max-height: 65px;
 }
-
-
 </style>

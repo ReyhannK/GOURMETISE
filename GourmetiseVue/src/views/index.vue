@@ -2,7 +2,7 @@
   <v-container>
     <v-row class="text-center my-12" justify="center">
       <v-col cols="12">
-        <img alt="Logo La Gourmetise" class="logo" src="../assets/logo.png"/>
+        <img alt="Logo La Gourmetise" class="logo" src="../assets/logo.png" />
         <h1>Bienvenue au Concours de la Meilleure Boulangerie</h1>
         <p>
           Participez au concours de la meilleure boulangerie organisé par La Gourmetise
@@ -19,7 +19,7 @@
             Inscrivez votre boulangerie pour tenter de remporter le titre de la meilleure boulangerie.
           </v-card-text>
           <v-card-actions>
-            <v-btn color="primary" to="/sign-in">S'inscrire</v-btn>
+            <v-btn color="primary" :disabled="!isOpen" to="/sign-in">S'inscrire</v-btn>
           </v-card-actions>
         </v-card>
       </v-col>
@@ -39,6 +39,35 @@
 </template>
 
 <script setup>
+import axios from 'axios';
+import { onMounted, ref } from 'vue';
+
+const params = ref();
+const isOpen = ref('');
+
+async function getContestParams() {
+  try {
+    const response = await axios.get(import.meta.env.VITE_API_URL + "/api/contestParams");
+    params.value = response.data;
+    isOpen.value = isContestOpen();
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+const isContestOpen = () => {
+  const startRegistrationDate = new Date(params.value?.startRegistration);
+  const endRegistrationDate = new Date(params.value?.endRegistration);
+  const currentDateObj = new Date();
+  //console.log("startRegistrationDate", startRegistrationDate);
+  //console.log("endRegistrationDate", endRegistrationDate);
+  //console.log("currentDateObj", currentDateObj);
+  return currentDateObj >= startRegistrationDate && currentDateObj <= endRegistrationDate;
+}
+
+onMounted(() => {
+  getContestParams();
+});
 </script>
 
 <style scoped>
