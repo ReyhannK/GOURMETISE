@@ -24,6 +24,11 @@ class APIUserController extends AbstractController
       $data = $request->getContent();
       try {
           $user = $serializer->deserialize($data, User::class, 'json');
+          $duplicateUser = $entityManager->getRepository(User::class)->findOneBy(['email' => $user->getEmail()]);
+          if($duplicateUser){
+            return new JsonResponse(["message" => "Cet email est déjà utilisé."], Response::HTTP_BAD_REQUEST);
+          }
+
           $user->setCreatedAt(new \DateTimeImmutable());
 
           $entityManager->persist($user);

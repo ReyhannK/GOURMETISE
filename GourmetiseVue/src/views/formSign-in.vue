@@ -179,7 +179,7 @@ async function submit() {
       "bakery_description": bakery_description.value,
       "products_decription": products_decription.value,
       "user": {
-        "email": "test2@gmail.com"
+        "email": "test3@gmail.com"
       }
     }
     const response = await axios.post(import.meta.env.VITE_API_URL + "/api/bakeries", newBakery);
