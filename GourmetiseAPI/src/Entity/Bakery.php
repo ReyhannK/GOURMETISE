@@ -5,36 +5,45 @@ namespace App\Entity;
 use App\Repository\BakeryRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: BakeryRepository::class)]
 class Bakery
 {
     #[ORM\Id]
     #[ORM\Column(length: 17)]
+    #[Groups(['Bakery:Read'])]
     private ?string $siret = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(['Bakery:Read'])]
     private ?string $name = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(['Bakery:Read'])]
     private ?string $street = null;
 
     #[ORM\Column(length: 5)]
+    #[Groups(['Bakery:Read'])]
     private ?string $postal_code = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(['Bakery:Read'])]
     private ?string $city = null;
 
     #[ORM\Column(length: 14)]
+    #[Groups(['Bakery:Read'])]
     private ?string $telephone_number = null;
 
     #[ORM\Column(length: 255)]
     private ?string $contact_name = null;
 
     #[ORM\Column(type: Types::TEXT)]
+    #[Groups(['Bakery:Read'])]
     private ?string $bakery_description = null;
 
     #[ORM\Column(type: Types::TEXT)]
+    #[Groups(['Bakery:Read'])]
     private ?string $products_decription = null;
 
     #[ORM\Column]

@@ -1,0 +1,17 @@
+<resources>
+    <string name="app_name">GourmetiseMobile</string>
+    <string name="home_title">La Gourmetise</string>
+    <string name="import_btn">Import</string>
+    <string name="discover_btn">Discover the bakery</string>
+    <string name="welcome">Welcome !</string>
+    <string name="voting_rules">To participate in the evaluation of the competition, you have to go
+        to a participating bakery and make a purchase.When paying, you will receive a
+        ticket delivered with a unique code to enter in the application before you can vote
+        .You rate the bakery out of three criteria: reception,
+        presentation of the store and the quality of the products. For each criterion, you assign a
+        score from 1 to 5. The total score of the bakery will be the sum of the three evaluations.
+        Before the end of the evaluation period, you must have sent at least 5 evaluations.
+        Make sure you follow this rule so that your vote is taken into account.Import
+        bakeries for start noting!
+    </string>
+</resources>

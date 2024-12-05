@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">GourmetiseMobile</string>
+    <string name="home_title">La Gourmetise</string>
+    <string name="import_btn">Importer</string>
+    <string name="discover_btn">Découvrir la boulangerie</string>
+    <string name="welcome">Bienvenue !</string>
+    <string name="voting_rules">Pour participer à l’évaluation du concours, tu dois te rendre dans
+        une boulangerie participante et y faire un achat.Lors du paiement, un ticket
+        te sera remis avec un code unique à saisir dans l’application avant de pouvoir voter.
+        Tu évalues la boulangerie sur trois critères : l’accueil, la présentation de la
+        boutique et la qualité des produits. Pour chaque critère, tu attribues une note de 1 à 5.
+        La note totale de la boulangerie sera la somme des trois évaluations.Avant la fin de
+        la période d’évaluation, tu dois avoir envoyé au minimum 5 évaluations. Assure-toi de bien
+        respecter cette règle pour que ton vote soit pris en compte.Importe les boulangeries
+        pour commencer à noter !
+    </string>
+</resources>

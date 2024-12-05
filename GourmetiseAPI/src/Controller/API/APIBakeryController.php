@@ -10,12 +10,29 @@ use Symfony\Component\HttpFoundation\Response;
 use App\Entity\Bakery;
 use App\Entity\ContestParams;
 use App\Entity\User;
+use App\Repository\BakeryRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Serializer\SerializerInterface;
 use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 
 class APIBakeryController extends AbstractController
 {
+    #[Route('/api/bakeries', methods :["GET"])]
+    public function getContestParams(BakeryRepository $repository) : JsonResponse
+    {
+        try{
+            $bakeries = $repository->findAll();
+            if(empty($bakeries)){
+                return new JsonResponse(["message" => "Il n'y a aucune boulangerie inscrite"], Response::HTTP_CONFLICT);
+            }
+            return $this->json($bakeries, Response::HTTP_OK, [], ['groups' => ['Bakery:Read']]);
+        }catch(\Exception $e){
+            echo $e->getMessage();
+            return new JsonResponse(["message" => "Erreur lors de la récupération des boulangerie."], Response::HTTP_CONFLICT);
+        }
+        
+    }
+
     #[Route('/api/bakeries', methods :["POST"])]
     public function createBakery(
         Request $request, 
