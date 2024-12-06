@@ -30,7 +30,6 @@ class APIBakeryController extends AbstractController
             echo $e->getMessage();
             return new JsonResponse(["message" => "Erreur lors de la récupération des boulangerie."], Response::HTTP_CONFLICT);
         }
-        
     }
 
     #[Route('/api/bakeries', methods :["POST"])]

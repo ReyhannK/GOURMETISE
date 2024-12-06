@@ -2,6 +2,7 @@
     <string name="app_name">GourmetiseMobile</string>
     <string name="home_title">La Gourmetise</string>
     <string name="import_btn">Import</string>
+    <string name="export_btn">Export</string>
     <string name="discover_btn">Discover the bakery</string>
     <string name="welcome">Welcome !</string>
     <string name="voting_rules">To participate in the evaluation of the competition, you have to go
@@ -14,4 +15,5 @@
         Make sure you follow this rule so that your vote is taken into account.Import
         bakeries for start noting!
     </string>
+    <string name="search_bakery">Search a bakery</string>
 </resources>

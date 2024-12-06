@@ -3,6 +3,7 @@
     <string name="app_name">GourmetiseMobile</string>
     <string name="home_title">La Gourmetise</string>
     <string name="import_btn">Importer</string>
+    <string name="export_btn">Exporter</string>
     <string name="discover_btn">Découvrir la boulangerie</string>
     <string name="welcome">Bienvenue !</string>
     <string name="voting_rules">Pour participer à l’évaluation du concours, tu dois te rendre dans
@@ -15,4 +16,5 @@
         respecter cette règle pour que ton vote soit pris en compte.Importe les boulangeries
         pour commencer à noter !
     </string>
+    <string name="search_bakery">Rechercher une boulangerie</string>
 </resources>
