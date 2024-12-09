@@ -177,7 +177,6 @@ class MainActivity : ComponentActivity() {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AccueilUI(modifier: Modifier = Modifier, bakeries: List<Bakery>) {
-    val context = LocalContext.current
     val (search, setSearch) = remember { mutableStateOf(TextFieldValue("")) }
     Column(
         modifier = Modifier

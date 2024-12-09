@@ -12,12 +12,32 @@
       <v-text-field v-model="street" :error-messages="streetError ? 'La rue ne doit pas être vide' : ''" label="Rue"
         type="input" clearable class="form-field"></v-text-field>
 
-      <v-text-field v-model="postal_code"
-        :error-messages="postal_codeError ? 'Le code postal est composé de 5 chiffres' : ''" label="Code postal"
-        placeholder="Exemple : 78 400" type="input" clearable class="normal-field form-field"></v-text-field>
+      <v-text-field 
+        v-model="postal_code"
+        :error-messages="postal_codeError ? 'Le code postal est composé de 5 chiffres' : ''"
+        label="Code postal"
+        placeholder="Exemple : 78 400" 
+        type="input"
+        class="normal-field form-field">
+      </v-text-field>
 
-      <v-text-field v-model="city" :error-messages="cityError ? 'La ville ne doit pas être vide' : ''" label="Ville"
+      <div v-if="cities == null">
+        <v-text-field v-model="city" :error-messages="cityError ? 'La ville ne doit pas être vide' : ''" label="Ville"
         type="input" clearable class="normal-field form-field"></v-text-field>
+      </div>
+
+      <div v-else>
+        <v-select
+          v-model="city"
+          label="Ville"
+          clearable
+          class="normal-field form-field"
+          :items="cities"
+          :error-messages="cityError ? 'La ville ne doit pas être vide' : ''"
+          :no-data-text="'Aucune ville disponible pour ce code postal'"
+        >
+        </v-select>
+      </div>
 
       <v-text-field v-model="telephone_number" @input="telephoneFormat"
         :error-messages="telephone_numberError ? 'Le numéro de téléphone est composé de 10 chiffres' : ''"
@@ -40,9 +60,14 @@
         placeholder="Exemple : La boulangerie propose une variété de produits faits maison, du pain de campagne à la croûte dorée aux viennoiseries feuilletées. Croissants, pains au chocolat, éclairs au chocolat..."
         class="form-field"></v-textarea>
 
-      <v-checkbox v-model="checkbox"
-        :error-messages="checkboxError ? 'Les conditions d\'utilisations doivent être acceptées' : ''" label="En soumettant ce formulaire, j'ai lu et accepté les conditions d'utilisations relatives à la
-        collecte de mes données." color="green"></v-checkbox>
+      <v-checkbox 
+        v-model="checkbox"
+        :error-messages="checkboxError ? 'Les conditions d\'utilisations doivent être acceptées' : ''"
+        label="En soumettant ce formulaire, j'ai lu et accepté les conditions d'utilisations relatives à la collecte de mes données."
+        color="green">
+      </v-checkbox>
+
+      <a href="javascript:void(0)" @click="privacy_policy = true">Conditions d'utilisations</a>
 
       <v-btn class="me-4 submit-btn" type="submit" color="green">
         Valider
@@ -59,11 +84,27 @@
       </v-dialog>
     </div>
 
+    <div class="text-center pa-4">
+      <v-dialog v-model="privacy_policy" width="auto">
+        <v-card 
+        max-width="400"
+        prepend-icon="mdi-shield-lock"
+        text="Le texte de la politique de confidentialité"
+        title="Politique de Confidentialité"
+        >
+          <template v-slot:actions>
+            <v-btn class="ms-auto" text="Ok" @click="privacy_policy = null;" color="black"></v-btn>
+          </template>
+        </v-card>
+      </v-dialog>
+    </div>
+
   </v-container>
 </template>
 
 <script setup>
 import axios from 'axios';
+import { watch } from 'vue';
 import { ref } from 'vue'
 // var remplit par le formulaire
 const siret = ref('');
@@ -89,8 +130,29 @@ const bakery_descriptionError = ref(false);
 const products_decriptionError = ref(false);
 const checkboxError = ref(false);
 
-//var pour la modale d'affichage
+//var cities qui stock les villes récupérer depuis l'API communes
+const cities = ref(null);
+
+//surveille le code postal pour récupérer les villes associées
+watch(postal_code, async (new_postal_code) => {
+  const regex = /^\d{5}$/;
+  const new_postal_code_without_space = new_postal_code.replace(/\s+/g, '');
+  if(regex.test(new_postal_code_without_space)){
+    try{
+    const response = await axios.get(`https://geo.api.gouv.fr/communes?codePostal=${new_postal_code_without_space}`);
+    cities.value = response.data.map(city => city.nom);
+    }catch (error){
+      console.log(error);
+    }
+  }
+  else{
+    cities.value = null;
+  }
+});
+
+//var pour les modales d'affichages
 const modal = ref(false);
+const privacy_policy = ref(false);
 
 //Formatage su numéro siret + téléphone
 const siretFormat = () => {
@@ -127,7 +189,9 @@ const validStreet = () => {
 
 const validCode_postal = () => {
   const regex = /^\d{5}$/;
-  return postal_codeError.value = !postal_code.value || !regex.test(postal_code.value.replace(/\s+/g, ''));
+  postal_codeError.value = !postal_code.value || !regex.test(postal_code.value.replace(/\s+/g, ''));
+  postal_code.value = postal_code.value.replace(/\s+/g, '');
+  return postal_codeError.value;
 };
 
 const validCity = () => {
@@ -179,7 +243,7 @@ async function submit() {
       "bakery_description": bakery_description.value,
       "products_decription": products_decription.value,
       "user": {
-        "email": "test3@gmail.com"
+        "email": "test2@gmail.com"
       }
     }
     const response = await axios.post(import.meta.env.VITE_API_URL + "/api/bakeries", newBakery);
