@@ -16,4 +16,5 @@
         bakeries for start noting!
     </string>
     <string name="search_bakery">Search a bakery</string>
+    <string name="alert_dialog_error">Error</string>
 </resources>

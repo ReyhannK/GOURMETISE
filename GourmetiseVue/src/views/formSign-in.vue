@@ -2,18 +2,40 @@
   <v-container>
     <h1>S'inscrire au concours</h1>
     <form @submit.prevent="submit" class="form-container">
-      <v-text-field v-model="siret" @input="siretFormat"
-        :error-messages="siretError ? 'Le N°siret doit être composé de 14 chiffres' : ''" label="N°Siret"
-        placeholder="Exemple : 271 405 681 16097" type="input" clearable class="normal-field form-field"></v-text-field>
+      <v-text-field 
+        v-model="siret"
+        @input="siretFormat(); validSiret();"
+        :error-messages="siretError ? 'Le N°siret doit être composé de 14 chiffres' : ''"
+        label="N°Siret"
+        placeholder="Exemple : 271 405 681 16097"
+        type="input"
+        clearable
+        class="normal-field form-field">
+      </v-text-field> 
 
-      <v-text-field v-model="name" :error-messages="nameError ? 'Le nom ne doit pas être vide' : ''" label="Nom"
-        type="input" clearable class="normal-field form-field"></v-text-field>
+      <v-text-field 
+        v-model="name"
+        @input="validName"
+        :error-messages="nameError ? 'Le nom ne doit pas être vide' : ''"
+        label="Nom"
+        type="input"
+        clearable
+        class="normal-field form-field">
+      </v-text-field>
 
-      <v-text-field v-model="street" :error-messages="streetError ? 'La rue ne doit pas être vide' : ''" label="Rue"
-        type="input" clearable class="form-field"></v-text-field>
+      <v-text-field 
+        v-model="street"
+        @input="validStreet"
+        :error-messages="streetError ? 'La rue ne doit pas être vide' : ''"
+        label="Rue"
+        type="input"
+        clearable
+        class="form-field">
+      </v-text-field>
 
       <v-text-field 
         v-model="postal_code"
+        @input="validCode_postal"
         :error-messages="postal_codeError ? 'Le code postal est composé de 5 chiffres' : ''"
         label="Code postal"
         placeholder="Exemple : 78 400" 
@@ -22,13 +44,21 @@
       </v-text-field>
 
       <div v-if="cities == null">
-        <v-text-field v-model="city" :error-messages="cityError ? 'La ville ne doit pas être vide' : ''" label="Ville"
-        type="input" clearable class="normal-field form-field"></v-text-field>
+        <v-text-field 
+        v-model="city"
+        @input="validCity"
+        :error-messages="cityError ? 'La ville ne doit pas être vide' : ''"
+        label="Ville"
+        type="input"
+        clearable
+        class="normal-field form-field">
+        </v-text-field>
       </div>
 
       <div v-else>
         <v-select
           v-model="city"
+          @input="validCity"
           label="Ville"
           clearable
           class="normal-field form-field"
@@ -39,26 +69,44 @@
         </v-select>
       </div>
 
-      <v-text-field v-model="telephone_number" @input="telephoneFormat"
+      <v-text-field
+        v-model="telephone_number"
+        @input="telephoneFormat(); validTelephone_number();"
         :error-messages="telephone_numberError ? 'Le numéro de téléphone est composé de 10 chiffres' : ''"
-        label="Numéro téléphone" placeholder="Exemple : 01 44 55 66 44" type="input" clearable
-        class="normal-field form-field"></v-text-field>
+        label="Numéro téléphone"
+        placeholder="Exemple : 01 44 55 66 44"
+        type="input"
+        clearable
+        class="normal-field form-field">
+      </v-text-field>
 
-      <v-text-field v-model="contact_name"
-        :error-messages="contact_nameError ? 'Le nom du contact ne doit pas être vide' : ''" label="Nom contact"
-        type="input" clearable class="normal-field form-field"></v-text-field>
+      <v-text-field
+        v-model="contact_name"
+        @input="validContact_name"
+        :error-messages="contact_nameError ? 'Le nom du contact ne doit pas être vide' : ''"
+        label="Nom contact"
+        type="input"
+        clearable
+        class="normal-field form-field">
+      </v-text-field>
 
-      <v-textarea v-model="bakery_description"
+      <v-textarea
+        v-model="bakery_description"
+        @input="validBakery_description"
         :error-messages="bakery_descriptionError ? 'La description de la boulangerie ne doit pas être vide' : ''"
         label="Description boulangerie"
         placeholder="Exemple : La Boulangerie du Bon Pain, située au cœur du village, séduit par ses senteurs alléchantes de pain frais et de viennoiseries dorées.Son décor chaleureux et son accueil souriant..."
-        class="form-field"></v-textarea>
+        class="form-field">
+      </v-textarea>
 
-      <v-textarea v-model="products_decription"
+      <v-textarea 
+        v-model="products_decription"
+        @input="validProducts_decription"
         :error-messages="products_decriptionError ? 'La description des produits ne doit pas être vide' : ''"
         label="Description des produits"
         placeholder="Exemple : La boulangerie propose une variété de produits faits maison, du pain de campagne à la croûte dorée aux viennoiseries feuilletées. Croissants, pains au chocolat, éclairs au chocolat..."
-        class="form-field"></v-textarea>
+        class="form-field">
+      </v-textarea>
 
       <v-checkbox 
         v-model="checkbox"
@@ -139,8 +187,8 @@ watch(postal_code, async (new_postal_code) => {
   const new_postal_code_without_space = new_postal_code.replace(/\s+/g, '');
   if(regex.test(new_postal_code_without_space)){
     try{
-    const response = await axios.get(`https://geo.api.gouv.fr/communes?codePostal=${new_postal_code_without_space}`);
-    cities.value = response.data.map(city => city.nom);
+      const response = await axios.get(`https://geo.api.gouv.fr/communes?codePostal=${new_postal_code_without_space}`);
+      cities.value = response.data.map(city => city.nom);
     }catch (error){
       console.log(error);
     }
@@ -243,7 +291,7 @@ async function submit() {
       "bakery_description": bakery_description.value,
       "products_decription": products_decription.value,
       "user": {
-        "email": "test2@gmail.com"
+        "email": "test5@gmail.com"
       }
     }
     const response = await axios.post(import.meta.env.VITE_API_URL + "/api/bakeries", newBakery);

@@ -17,9 +17,18 @@ class GourmetiseHelper (context : Context)
                 + "telephone_number TEXT NOT NULL,"
                 + "bakery_description TEXT NOT NULL,"
                 + "products_decription TEXT NOT NULL);");
+
+        // création de la table ContestParams
+        db.execSQL("CREATE TABLE contestParams ("
+                + "id INTEGER PRIMARY KEY AUTOINCREMENT,"
+                + "startRegistration TEXT NOT NULL,"
+                + "endRegistration TEXT NOT NULL,"
+                + "startEvaluation TEXT NOT NULL,"
+                + "endEvaluation TEXT NOT NULL);");
     }
     override fun onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {
         db.execSQL("DROP TABLE IF EXISTS bakery;");
+        db.execSQL("DROP TABLE IF EXISTS contestParams;");
         onCreate(db);
     }
 }

@@ -22,19 +22,19 @@ class ContestParams
     private ?string $description = null;
 
     #[ORM\Column(type: 'datetime', nullable: false)]
-    #[Groups(['ContestParams:Read', 'ContestParams:Write'])]
+    #[Groups(['ContestParams:Read', 'ContestParams:Write', 'ContestParams:Mobile'])]
     private ?\DateTimeInterface $startRegistration = null;
 
     #[ORM\Column(type: 'datetime', nullable: false)]
-    #[Groups(['ContestParams:Read', 'ContestParams:Write'])]
+    #[Groups(['ContestParams:Read', 'ContestParams:Write', 'ContestParams:Mobile'])]
     private ?\DateTimeInterface $endRegistration = null;
 
     #[ORM\Column(type: 'datetime', nullable: false)]
-    #[Groups(['ContestParams:Read','ContestParams:Write'])]
+    #[Groups(['ContestParams:Read','ContestParams:Write', 'ContestParams:Mobile'])]
     private ?\DateTimeInterface $startEvaluation = null;
 
     #[ORM\Column(type: 'datetime', nullable: false)]
-    #[Groups(['ContestParams:Read','ContestParams:Write'])]
+    #[Groups(['ContestParams:Read','ContestParams:Write', 'ContestParams:Mobile'])]
     private ?\DateTimeInterface $endEvaluation = null;
 
     public function getId(): ?int

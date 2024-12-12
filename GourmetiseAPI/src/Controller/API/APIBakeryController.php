@@ -17,15 +17,27 @@ use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 
 class APIBakeryController extends AbstractController
 {
-    #[Route('/api/bakeries', methods :["GET"])]
-    public function getContestParams(BakeryRepository $repository) : JsonResponse
+    #[Route('/api/mobile/bakeries', methods :["GET"])]
+    public function getContestParams(EntityManagerInterface $entityManager) : JsonResponse
     {
         try{
-            $bakeries = $repository->findAll();
+            $now = new \DateTimeImmutable();
+            $contestParams = $entityManager->getRepository(ContestParams::class)->findLastContestParams();
+            if(!$contestParams){
+                return new JsonResponse(["message" => "Erreur dans les paramètres du concours."], Response::HTTP_BAD_REQUEST);
+            }
+            if($now < $contestParams->getStartRegistration()){
+                return new JsonResponse(["message" => "Les inscriptions aux concours ne sont pas encore ouvertes."], Response::HTTP_BAD_REQUEST);
+            }
+            if($now>$contestParams->getEndRegistration()){
+                return new JsonResponse(["message" => "Le concours a déjà débuté, les inscriptions sont fermés."], Response::HTTP_BAD_REQUEST);
+            }
+
+            $bakeries = $entityManager->getRepository(Bakery::class)->findAll();
             if(empty($bakeries)){
                 return new JsonResponse(["message" => "Il n'y a aucune boulangerie inscrite"], Response::HTTP_CONFLICT);
             }
-            return $this->json($bakeries, Response::HTTP_OK, [], ['groups' => ['Bakery:Read']]);
+            return $this->json( ['bakeries' => $bakeries,'contestParams' => $contestParams], Response::HTTP_OK, [], ['groups' => ['Bakery:Read', 'ContestParams:Mobile']]);
         }catch(\Exception $e){
             echo $e->getMessage();
             return new JsonResponse(["message" => "Erreur lors de la récupération des boulangerie."], Response::HTTP_CONFLICT);

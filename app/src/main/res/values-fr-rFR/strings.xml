@@ -17,4 +17,5 @@
         pour commencer à noter !
     </string>
     <string name="search_bakery">Rechercher une boulangerie</string>
+    <string name="alert_dialog_error">Erreur</string>
 </resources>

@@ -4,7 +4,6 @@ import android.annotation.SuppressLint
 import android.content.ContentValues
 import android.content.Context
 import android.database.sqlite.SQLiteDatabase
-import android.provider.ContactsContract.Data
 
 class BakeryDAO (context : Context) {
     lateinit var DataBase : SQLiteDatabase

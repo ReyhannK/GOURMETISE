@@ -22,6 +22,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -67,10 +68,12 @@ class MainActivity : ComponentActivity() {
         setContent {
             GourmetiseMobileTheme {
                 val context = LocalContext.current
-                var bdd = BakeryDAO(context = context);
+                val bakeryDao = BakeryDAO(context = context);
+                val contestParamsDao = ContestParamsDAO(context = context);
+                var messageError by remember { mutableStateOf("") }
                 var bakeries by remember { mutableStateOf(mutableListOf<Bakery>()) }
                 var isImported by remember { mutableStateOf(false) }
-                bakeries = bdd.getBakeries()
+                bakeries = bakeryDao.getBakeries()
                 isImported = bakeries.isNotEmpty()
                 Scaffold(
                     modifier = Modifier.fillMaxSize(),
@@ -98,7 +101,7 @@ class MainActivity : ComponentActivity() {
                                         onClick = {
                                             val clientHTTP = OkHttpClient()
                                             val request = Request.Builder()
-                                                .url("http://10.0.2.2:8000/api/bakeries")
+                                                .url("http://10.0.2.2:8000/api/mobile/bakeries")
                                                 .build()
 
                                             clientHTTP.newCall(request).enqueue(object : okhttp3.Callback {
@@ -113,9 +116,10 @@ class MainActivity : ComponentActivity() {
                                                         val flux = response.body!!.string()
                                                         Log.i("CodeHTTP", response.code.toString())
                                                         Log.i("REPONSE", flux)
-                                                        val fluxJson = JSONArray(flux)
-                                                        for (i in 0 until fluxJson.length()) {
-                                                            val jsonObject: JSONObject = fluxJson.getJSONObject(i)
+                                                        val jsonResponse  = JSONObject(flux)
+                                                        val bakeriesArray  = jsonResponse.getJSONArray("bakeries")
+                                                        for (i in 0 until bakeriesArray.length()) {
+                                                            val jsonObject: JSONObject = bakeriesArray.getJSONObject(i)
                                                             val b = Bakery()
                                                             b.siret = jsonObject.getString("siret")
                                                             b.name = jsonObject.getString("name")
@@ -125,18 +129,23 @@ class MainActivity : ComponentActivity() {
                                                             b.telephone_number = jsonObject.getString("telephone_number");
                                                             b.bakery_description = jsonObject.getString("bakery_description");
                                                             b.products_decription = jsonObject.getString("products_decription");
-                                                            bdd.addBakery(b);
+                                                            bakeryDao.addBakery(b);
                                                         }
+                                                        val contestParamsObject  = jsonResponse.getJSONObject("contestParams")
+                                                        val c = ContestParams()
+                                                        c.startRegistration = contestParamsObject.getString("startRegistration");
+                                                        c.endRegistration = contestParamsObject.getString("endRegistration");
+                                                        c.startEvaluation = contestParamsObject.getString("startEvaluation");
+                                                        c.endEvaluation = contestParamsObject.getString("endEvaluation");
+                                                        contestParamsDao.addContestParams(c);
+
                                                         runOnUiThread { Toast.makeText(context, "IMPORT REUSSI !",
                                                             Toast.LENGTH_SHORT).show()
                                                         }
-                                                        bakeries = bdd.getBakeries()
+                                                        bakeries = bakeryDao.getBakeries()
                                                         isImported = true
                                                     } else {
-                                                        runOnUiThread { Toast.makeText(context, "ECHEC IMPORT !\n" +
-                                                                response.code.toString()+ " "
-                                                                +response.message, Toast.LENGTH_SHORT).show()
-                                                        }
+                                                        messageError = JSONObject(response.body!!.string()).getString("message")
                                                     }
                                                 }
                                             })
@@ -167,7 +176,11 @@ class MainActivity : ComponentActivity() {
                         }
                     }
                 ) {
-                    AccueilUI(modifier = Modifier, bakeries)
+                    AccueilUI(
+                        modifier = Modifier,
+                        bakeries,
+                        messageError,
+                        onValidate = { value -> messageError = value})
                 }
             }
         }
@@ -176,7 +189,7 @@ class MainActivity : ComponentActivity() {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AccueilUI(modifier: Modifier = Modifier, bakeries: List<Bakery>) {
+fun AccueilUI(modifier: Modifier = Modifier, bakeries: List<Bakery>, messageError: String,onValidate: (String) -> Unit) {
     val (search, setSearch) = remember { mutableStateOf(TextFieldValue("")) }
     Column(
         modifier = Modifier
@@ -233,6 +246,23 @@ fun AccueilUI(modifier: Modifier = Modifier, bakeries: List<Bakery>) {
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(16.dp)
+                )
+            }
+
+            if(messageError.isNotEmpty()){
+                AlertDialog(
+                    onDismissRequest = { onValidate("") },
+                    title = { Text(text = stringResource(R.string.alert_dialog_error)) },
+                    text = {
+                        Text(text = messageError)
+                    },
+                    confirmButton = {
+                        Button(onClick = {
+                            onValidate("")
+                        }) {
+                            Text("OK")
+                        }
+                    }
                 )
             }
         }
