@@ -332,7 +332,6 @@ fun ElementList(bakery: Bakery){
                     contentScale = ContentScale.Fit,
                     modifier = Modifier.padding(10.dp),
                 )
-
             }
             Column (modifier = Modifier.weight(0.7f)){
                 Text(

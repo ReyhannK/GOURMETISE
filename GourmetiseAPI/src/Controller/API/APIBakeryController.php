@@ -26,11 +26,11 @@ class APIBakeryController extends AbstractController
             if(!$contestParams){
                 return new JsonResponse(["message" => "Erreur dans les paramètres du concours."], Response::HTTP_BAD_REQUEST);
             }
-            if($now < $contestParams->getStartRegistration()){
-                return new JsonResponse(["message" => "Les inscriptions aux concours ne sont pas encore ouvertes."], Response::HTTP_BAD_REQUEST);
+            if($now < $contestParams->getStartEvaluation()){
+                return new JsonResponse(["message" => "Les votes au concours ne sont pas encore ouverts."], Response::HTTP_BAD_REQUEST);
             }
-            if($now>$contestParams->getEndRegistration()){
-                return new JsonResponse(["message" => "Le concours a déjà débuté, les inscriptions sont fermés."], Response::HTTP_BAD_REQUEST);
+            if($now>$contestParams->getEndEvaluation()){
+                return new JsonResponse(["message" => "Les votes au concours sont fermés."], Response::HTTP_BAD_REQUEST);
             }
 
             $bakeries = $entityManager->getRepository(Bakery::class)->findAll();
