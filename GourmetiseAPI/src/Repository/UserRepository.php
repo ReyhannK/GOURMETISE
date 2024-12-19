@@ -5,15 +5,53 @@ namespace App\Repository;
 use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use Lexik\Bundle\JWTAuthenticationBundle\Services\JWTTokenManagerInterface;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
+use Symfony\Component\Security\Core\User\PasswordUpgraderInterface;
 
 /**
  * @extends ServiceEntityRepository<User>
  */
 class UserRepository extends ServiceEntityRepository
 {
-    public function __construct(ManagerRegistry $registry)
+    private UserPasswordHasherInterface $passwordHasher;
+    private JWTTokenManagerInterface $JWTManager;
+
+    public function __construct(
+        ManagerRegistry $registry,
+        UserPasswordHasherInterface $passwordHasher,
+        JWTTokenManagerInterface $JWTManager
+        )
     {
         parent::__construct($registry, User::class);
+        $this->passwordHasher = $passwordHasher;
+        $this->JWTManager = $JWTManager;
+    }
+
+    public function registerUser(User $user): ?string
+    {
+        //Hasher le mdp
+        $hashedPassword = $this->passwordHasher->hashPassword($user, $user->getPassword());
+        $user->setPassword($hashedPassword);
+
+        //Persiste l'utilisateur en bdd
+        $entityManager = $this->getEntityManager();
+        $entityManager->persist($user);
+        $entityManager->flush();
+
+        //Genere un JWT pour l'utilisateur
+        return $this->JWTManager->create($user);
+    }
+
+    public function authenticateUser(User $user, string $plainPassword): ?string
+    {
+        //Verifie si le mdp correspond au mdp hashé de l'utilisateur
+        if($this->passwordHasher->isPasswordValid($user, $plainPassword))
+        {
+            //Genere un JWT pour l'utilisateur
+            return $this->JWTManager->create($user);
+        }
+        return null;
     }
 
     //    /**

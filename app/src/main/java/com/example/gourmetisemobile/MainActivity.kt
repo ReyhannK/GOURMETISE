@@ -30,6 +30,7 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -180,7 +181,8 @@ class MainActivity : ComponentActivity() {
                         modifier = Modifier,
                         bakeries,
                         messageError,
-                        onValidate = { value -> messageError = value})
+                        onValidate = { value -> messageError = value},
+                    )
                 }
             }
         }
@@ -270,7 +272,8 @@ fun AccueilUI(modifier: Modifier = Modifier, bakeries: List<Bakery>, messageErro
         if(bakeries.isNotEmpty()){
             OutlinedTextField(
                 value = search,
-                onValueChange = { newValue -> setSearch(newValue) },
+                onValueChange = {
+                    newValue -> setSearch(newValue)},
                 singleLine = true,
                 placeholder = {
                     Text(
@@ -289,11 +292,15 @@ fun AccueilUI(modifier: Modifier = Modifier, bakeries: List<Bakery>, messageErro
                     .fillMaxWidth()
                     .height(50.dp),
                 trailingIcon = {
-                    Icon(
-                        painter = painterResource(R.drawable.magnifying_glass_logo),
-                        contentDescription = null,
-                        modifier = Modifier.size(30.dp)
-                    )
+                    IconButton(
+                        onClick = { }
+                    ) {
+                        Icon(
+                            painter = painterResource(R.drawable.magnifying_glass_logo),
+                            contentDescription = null,
+                            modifier = Modifier.size(30.dp)
+                        )
+                    }
                 }
             )
 

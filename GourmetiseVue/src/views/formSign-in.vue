@@ -153,6 +153,7 @@
 <script setup>
 import axios from 'axios';
 import { watch } from 'vue';
+import { jwtDecode } from "jwt-decode";
 import { ref } from 'vue'
 // var remplit par le formulaire
 const siret = ref('');
@@ -280,6 +281,21 @@ async function submit() {
     return;
   }
   try {
+    const token = localStorage.getItem('token');
+    if (!token) {
+          console.error('Token non trouvé dans le localStorage');
+          return;
+    }
+
+    let decodedToken;
+    try {
+      decodedToken = jwtDecode(token);
+    } catch (error) {
+      console.error('Erreur lors du décodage du token:', error);
+      return;
+    }
+    const userEmail = decodedToken.username;
+
     const newBakery = {
       "siret": siret.value,
       "name": name.value,
@@ -291,10 +307,16 @@ async function submit() {
       "bakery_description": bakery_description.value,
       "products_decription": products_decription.value,
       "user": {
-        "email": "test5@gmail.com"
+        "email": userEmail
       }
     }
-    const response = await axios.post(import.meta.env.VITE_API_URL + "/api/bakeries", newBakery);
+    console.log(decodedToken);
+    const response = await axios.post(import.meta.env.VITE_API_URL + "/api/bakeries", newBakery, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      }
+    });
     modal.value = response.data.message;
   } catch (error) {
     if (error.response && error.response.data.message) {

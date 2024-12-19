@@ -52,4 +52,41 @@ class BakeryDAO (context : Context) {
         return bakeries
     }
 
+    @SuppressLint("Range")
+    fun getBakeriesByName(name: String): MutableList<Bakery> {
+        val bakeries = mutableListOf<Bakery>()
+        val cursor = DataBase.rawQuery(
+            "SELECT name, street, postal_code, city, telephone_number FROM bakery WHERE name = ?",
+            arrayOf(name)
+        )
+
+        try {
+            cursor.moveToFirst()
+            while (!cursor.isAfterLast) {
+                val bakeryName = cursor.getString(cursor.getColumnIndex("name"))
+                val street = cursor.getString(cursor.getColumnIndex("street"))
+                val postal_code = cursor.getString(cursor.getColumnIndex("postal_code"))
+                val city = cursor.getString(cursor.getColumnIndex("city"))
+                val telephone_number = cursor.getString(cursor.getColumnIndex("telephone_number"))
+
+                val bakery = Bakery().apply {
+                    this.name = bakeryName
+                    this.street = street
+                    this.postal_code = postal_code
+                    this.city = city
+                    this.telephone_number = telephone_number
+                }
+                bakeries.add(bakery)
+                cursor.moveToNext()
+            }
+        } catch (e: Exception) {
+            e.printStackTrace() // En cas d'erreur, vous pouvez logger l'exception ou gérer l'erreur
+        } finally {
+            cursor.close() // Assurez-vous de fermer le curseur dans tous les cas
+        }
+
+        return bakeries
+    }
+
+
 }
