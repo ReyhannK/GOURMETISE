@@ -12,7 +12,6 @@ class ProfileUser extends AbstractController
     #[Route('api/profile', name: 'profile', methods: ['GET'])]
     public function getProfile(): JsonResponse
     {
-        //recupere l'utilisateur connecte
         $user = $this->getUser();
         return $this->json($user, Response::HTTP_OK);
     }

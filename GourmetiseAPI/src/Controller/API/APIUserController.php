@@ -30,7 +30,7 @@ class APIUserController extends AbstractController
           }
 
           $user->setCreatedAt(new \DateTimeImmutable());
-          $user->setRoles(["participant"]);
+          $user->setRoles(["ROLE_PARTICIPANT"]);
 
           $jwt = $entityManager->getRepository(User::class)->registerUser($user);
 

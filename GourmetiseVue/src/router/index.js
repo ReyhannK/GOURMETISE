@@ -1,7 +1,7 @@
 import {createRouter, createWebHistory} from 'vue-router'
 import Index from "@/views/index.vue";
 import ContestParams from "@/views/contestParams.vue";
-import SignInBakery from "@/views/formSign-in.vue";
+import SignInBakery from "@/views/formSignIn.vue";
 import CreateAccount from "@/views/createAccount.vue";
 import Login from "@/views/login.vue";
 

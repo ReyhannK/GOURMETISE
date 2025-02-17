@@ -79,7 +79,7 @@ class APIBakeryController extends AbstractController
             {
                 return new JsonResponse(["message" => "Vous n'avez pas de compte."], Response::HTTP_BAD_REQUEST);
             }
-            if((!in_array('participant', $user->getRoles())))
+            if((!in_array('ROLE_PARTICIPANT', $user->getRoles())))
             {
                 return new JsonResponse(["message" => "Vous n'etes pas un participant."], Response::HTTP_BAD_REQUEST);
             }
