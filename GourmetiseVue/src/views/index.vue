@@ -19,7 +19,7 @@
             Inscrivez votre boulangerie pour tenter de remporter le titre de la meilleure boulangerie.
           </v-card-text>
           <v-card-actions>
-            <v-btn color="primary" :disabled="!isOpen" to="/sign-in-bakery">S'inscrire</v-btn>
+            <v-btn color="primary" :disabled="!isOpen" to="/sign-in">S'inscrire</v-btn>
           </v-card-actions>
         </v-card>
       </v-col>
@@ -62,7 +62,11 @@ async function getContestParams() {
     }
   
   try {
-    const response = await axios.get(import.meta.env.VITE_API_URL + "/api/contestParams");
+    const response = await axios.get(import.meta.env.VITE_API_URL + "/api/contestParams", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        }
+    });
     params.value = response.data;
     isOpen.value = isContestOpen();
   } catch (error) {
@@ -74,9 +78,6 @@ const isContestOpen = () => {
   const startRegistrationDate = new Date(params.value?.startRegistration);
   const endRegistrationDate = new Date(params.value?.endRegistration);
   const currentDateObj = new Date();
-  //console.log("startRegistrationDate", startRegistrationDate);
-  //console.log("endRegistrationDate", endRegistrationDate);
-  //console.log("currentDateObj", currentDateObj);
   return currentDateObj >= startRegistrationDate && currentDateObj <= endRegistrationDate;
 }
 

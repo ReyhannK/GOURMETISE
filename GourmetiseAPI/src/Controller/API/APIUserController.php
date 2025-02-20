@@ -58,10 +58,10 @@ class APIUserController extends AbstractController
       try {
           $user = $serializer->deserialize($data, User::class, 'json');
           $duplicateUser = $entityManager->getRepository(User::class)->findOneBy(['email' => $user->getEmail()]);
+
           if(!$duplicateUser){
             return new JsonResponse(["message" => "Mot de passe ou email incorrect"], Response::HTTP_BAD_REQUEST);
           }
-
           $user->setCreatedAt(new \DateTimeImmutable());
 
           $jwt = $entityManager->getRepository(User::class)->authenticateUser($duplicateUser, $user->getPassword());

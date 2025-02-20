@@ -36,15 +36,15 @@ class BakeryDAO (context : Context) {
         while (!curseur.isAfterLast()) {
             val name = curseur.getString(curseur.getColumnIndex("name"))
             val street = curseur.getString(curseur.getColumnIndex("street"))
-            val postal_code = curseur.getString(curseur.getColumnIndex("postal_code"))
+            val postalCode = curseur.getString(curseur.getColumnIndex("postal_code"))
             val city = curseur.getString(curseur.getColumnIndex("city"))
-            val telephone_number = curseur.getString(curseur.getColumnIndex("telephone_number"))
+            val telephoneNumber = curseur.getString(curseur.getColumnIndex("telephone_number"))
             var bakery = Bakery()
             bakery.name = name
             bakery.street = street
-            bakery.postal_code = postal_code
+            bakery.postal_code = postalCode
             bakery.city = city
-            bakery.telephone_number = telephone_number
+            bakery.telephone_number = telephoneNumber
             bakeries.add(bakery)
             curseur.moveToNext()
         }
@@ -65,24 +65,24 @@ class BakeryDAO (context : Context) {
             while (!cursor.isAfterLast) {
                 val bakeryName = cursor.getString(cursor.getColumnIndex("name"))
                 val street = cursor.getString(cursor.getColumnIndex("street"))
-                val postal_code = cursor.getString(cursor.getColumnIndex("postal_code"))
+                val postalCode = cursor.getString(cursor.getColumnIndex("postal_code"))
                 val city = cursor.getString(cursor.getColumnIndex("city"))
-                val telephone_number = cursor.getString(cursor.getColumnIndex("telephone_number"))
+                val telephoneNumber = cursor.getString(cursor.getColumnIndex("telephone_number"))
 
                 val bakery = Bakery().apply {
                     this.name = bakeryName
                     this.street = street
-                    this.postal_code = postal_code
+                    this.postal_code = postalCode
                     this.city = city
-                    this.telephone_number = telephone_number
+                    this.telephone_number = telephoneNumber
                 }
                 bakeries.add(bakery)
                 cursor.moveToNext()
             }
         } catch (e: Exception) {
-            e.printStackTrace() // En cas d'erreur, vous pouvez logger l'exception ou gérer l'erreur
+            e.printStackTrace()
         } finally {
-            cursor.close() // Assurez-vous de fermer le curseur dans tous les cas
+            cursor.close()
         }
 
         return bakeries

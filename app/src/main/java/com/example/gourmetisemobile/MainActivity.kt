@@ -293,7 +293,7 @@ fun AccueilUI(modifier: Modifier = Modifier, bakeries: List<Bakery>, messageErro
                     .height(50.dp),
                 trailingIcon = {
                     IconButton(
-                        onClick = { }
+                        onClick = {}
                     ) {
                         Icon(
                             painter = painterResource(R.drawable.magnifying_glass_logo),
