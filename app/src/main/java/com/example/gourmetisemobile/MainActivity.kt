@@ -1,6 +1,8 @@
 package com.example.gourmetisemobile
 
 import android.annotation.SuppressLint
+import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
@@ -179,6 +181,7 @@ class MainActivity : ComponentActivity() {
                 ) {
                     AccueilUI(
                         modifier = Modifier,
+                        context,
                         bakeries,
                         messageError,
                         onValidate = { value -> messageError = value},
@@ -191,7 +194,7 @@ class MainActivity : ComponentActivity() {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AccueilUI(modifier: Modifier = Modifier, bakeries: List<Bakery>, messageError: String,onValidate: (String) -> Unit) {
+fun AccueilUI(modifier: Modifier = Modifier, context: Context, bakeries: List<Bakery>, messageError: String, onValidate: (String) -> Unit) {
     val (search, setSearch) = remember { mutableStateOf(TextFieldValue("")) }
     Column(
         modifier = Modifier
@@ -310,7 +313,7 @@ fun AccueilUI(modifier: Modifier = Modifier, bakeries: List<Bakery>, messageErro
                     .padding(bottom = 70.dp)
             ) {
                 items(bakeries) { bakery ->
-                    ElementList(bakery = bakery)
+                    ElementList(bakery = bakery, context)
                 }
             }
         }
@@ -318,7 +321,7 @@ fun AccueilUI(modifier: Modifier = Modifier, bakeries: List<Bakery>, messageErro
 }
 
 @Composable
-fun ElementList(bakery: Bakery){
+fun ElementList(bakery: Bakery, context: Context){
     Card(
         modifier = Modifier
             .padding(16.dp)
@@ -328,34 +331,40 @@ fun ElementList(bakery: Bakery){
             containerColor = Color(0xFFF0F0F0)
         )
     ){
-        Row(
+        Column(
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween
+            verticalArrangement = Arrangement.SpaceBetween
         ){
-            Column (modifier = Modifier.weight(0.3f)){
+            Row (
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.Top
+            ){
                 Image(
                     painter = painterResource(R.drawable.logo),
                     contentDescription = null,
                     contentScale = ContentScale.Fit,
                     modifier = Modifier.padding(10.dp),
                 )
-            }
-            Column (modifier = Modifier.weight(0.7f)){
                 Text(
                     text = bakery.name,
-                    modifier = Modifier.padding(10.dp),
+                    modifier = Modifier.padding(20.dp),
                     fontWeight = FontWeight.Normal
                 )
-                Text(
-                    text = bakery.street + " " + bakery.postal_code + " " + bakery.city,
-                    modifier = Modifier.padding(start=10.dp, bottom = 10.dp),
-                    fontWeight = FontWeight.Bold
-                )
-                Text(
-                    text = bakery.telephone_number,
-                    modifier = Modifier.padding(start=10.dp, bottom = 10.dp),
-                    fontWeight = FontWeight.Normal
-                )
+            }
+            Text(
+                text = bakery.getFullAdress(),
+                modifier = Modifier.padding(start=10.dp, bottom = 10.dp),
+                fontWeight = FontWeight.Bold
+            )
+            Text(
+                text = bakery.telephone_number,
+                modifier = Modifier.padding(start=10.dp, bottom = 10.dp),
+                fontWeight = FontWeight.Normal
+            )
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.End
+            ){
                 Button(
                     modifier = Modifier
                         .height(44.dp)
@@ -365,7 +374,12 @@ fun ElementList(bakery: Bakery){
                         containerColor = Color(0xFFD9D9D9),
                         contentColor = Color.Black
                     ),
-                    onClick = { /* Action du bouton */ }
+                    onClick = {
+                        val intent = Intent(context, RatingpPage::class.java).apply {
+                            putExtra("intent_bakery", bakery)
+                        }
+                        context.startActivity(intent)
+                    }
                 ) {
                     Text(stringResource(R.string.discover_btn))
                 }

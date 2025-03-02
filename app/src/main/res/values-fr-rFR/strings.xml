@@ -4,7 +4,7 @@
     <string name="home_title">La Gourmetise</string>
     <string name="import_btn">Importer</string>
     <string name="export_btn">Exporter</string>
-    <string name="discover_btn">Découvrir la boulangerie</string>
+    <string name="discover_btn">Découvrir</string>
     <string name="welcome">Bienvenue !</string>
     <string name="voting_rules">Pour participer à l’évaluation du concours, tu dois te rendre dans
         une boulangerie participante et y faire un achat.Lors du paiement, un ticket
@@ -18,4 +18,14 @@
     </string>
     <string name="search_bakery">Rechercher une boulangerie</string>
     <string name="alert_dialog_error">Erreur</string>
+    <string name="bakery_not_found">Boulangerie non trouvée</string>
+    <string name="bakery_description">Description boulangerie</string>
+    <string name="product_description">Description des produits</string>
+    <string name="house_icon">house</string>
+    <string name="croissant_icon">croissant</string>
+    <string name="address_icon">address</string>
+    <string name="phone_icon">phone</string>
+    <string name="no_content">Aucun contenu</string>
+    <string name="address">Addresse : </string>
+    <string name="phone_number">N°Téléphone : </string>
 </resources>

@@ -3,7 +3,7 @@
     <string name="home_title">La Gourmetise</string>
     <string name="import_btn">Import</string>
     <string name="export_btn">Export</string>
-    <string name="discover_btn">Discover the bakery</string>
+    <string name="discover_btn">Discover</string>
     <string name="welcome">Welcome !</string>
     <string name="voting_rules">To participate in the evaluation of the competition, you have to go
         to a participating bakery and make a purchase.When paying, you will receive a
@@ -17,4 +17,14 @@
     </string>
     <string name="search_bakery">Search a bakery</string>
     <string name="alert_dialog_error">Error</string>
+    <string name="bakery_not_found">Bakery not found</string>
+    <string name="bakery_description">Bakery description</string>
+    <string name="product_description">Product description</string>
+    <string name="house_icon">house</string>
+    <string name="croissant_icon">croissant</string>
+    <string name="address_icon">address</string>
+    <string name="phone_icon">phone</string>
+    <string name="no_content">No content</string>
+    <string name="address">Address : </string>
+    <string name="phone_number">Phone number : </string>
 </resources>

@@ -30,63 +30,31 @@ class BakeryDAO (context : Context) {
     @SuppressLint("Range")
     fun getBakeries(): MutableList<Bakery> {
         val bakeries = mutableListOf<Bakery>()
-        val curseur = DataBase.rawQuery("SELECT name,street, postal_code, city,telephone_number from bakery",arrayOf())
+        val curseur = DataBase.rawQuery("SELECT * from bakery",arrayOf())
 
         curseur.moveToFirst()
         while (!curseur.isAfterLast()) {
+            val siret = curseur.getString(curseur.getColumnIndex("siret"))
             val name = curseur.getString(curseur.getColumnIndex("name"))
             val street = curseur.getString(curseur.getColumnIndex("street"))
             val postalCode = curseur.getString(curseur.getColumnIndex("postal_code"))
             val city = curseur.getString(curseur.getColumnIndex("city"))
             val telephoneNumber = curseur.getString(curseur.getColumnIndex("telephone_number"))
+            val bakery_description = curseur.getString(curseur.getColumnIndex("bakery_description"))
+            val products_decription = curseur.getString(curseur.getColumnIndex("products_decription"))
             var bakery = Bakery()
+            bakery.siret = siret
             bakery.name = name
             bakery.street = street
             bakery.postal_code = postalCode
             bakery.city = city
             bakery.telephone_number = telephoneNumber
+            bakery.bakery_description = bakery_description
+            bakery.products_decription = products_decription
             bakeries.add(bakery)
             curseur.moveToNext()
         }
         curseur.close()
         return bakeries
     }
-
-    @SuppressLint("Range")
-    fun getBakeriesByName(name: String): MutableList<Bakery> {
-        val bakeries = mutableListOf<Bakery>()
-        val cursor = DataBase.rawQuery(
-            "SELECT name, street, postal_code, city, telephone_number FROM bakery WHERE name = ?",
-            arrayOf(name)
-        )
-
-        try {
-            cursor.moveToFirst()
-            while (!cursor.isAfterLast) {
-                val bakeryName = cursor.getString(cursor.getColumnIndex("name"))
-                val street = cursor.getString(cursor.getColumnIndex("street"))
-                val postalCode = cursor.getString(cursor.getColumnIndex("postal_code"))
-                val city = cursor.getString(cursor.getColumnIndex("city"))
-                val telephoneNumber = cursor.getString(cursor.getColumnIndex("telephone_number"))
-
-                val bakery = Bakery().apply {
-                    this.name = bakeryName
-                    this.street = street
-                    this.postal_code = postalCode
-                    this.city = city
-                    this.telephone_number = telephoneNumber
-                }
-                bakeries.add(bakery)
-                cursor.moveToNext()
-            }
-        } catch (e: Exception) {
-            e.printStackTrace()
-        } finally {
-            cursor.close()
-        }
-
-        return bakeries
-    }
-
-
 }
