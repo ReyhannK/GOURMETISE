@@ -1,8 +1,10 @@
-package com.example.gourmetisemobile
+package com.example.gourmetisemobile.dao
 
 import android.content.ContentValues
 import android.content.Context
 import android.database.sqlite.SQLiteDatabase
+import com.example.gourmetisemobile.GourmetiseHelper
+import com.example.gourmetisemobile.dataclass.ContestParams
 
 class ContestParamsDAO (context : Context) {
     lateinit var DataBase : SQLiteDatabase

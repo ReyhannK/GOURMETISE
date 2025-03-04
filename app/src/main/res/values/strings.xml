@@ -27,4 +27,14 @@
     <string name="no_content">No content</string>
     <string name="address">Address : </string>
     <string name="phone_number">Phone number : </string>
+    <string name="rate_bakery_btn">Rate the bakery</string>
+    <string name="rating_title">Rates the bakery on 3 criteria</string>
+    <string name="rating_purchase_code">Purchase code (6 characters)</string>
+    <string name="rating_reception_criteria">Reception : </string>
+    <string name="rating_product_criteria">Product quality : </string>
+    <string name="rating_decoration_criteria">Decoration : </string>
+    <string name="ok">Ok</string>
+    <string name="cancel">Cancel</string>
+    <string name="error_message_access_code">The code must be exactly 6 characters long</string>
+    <string name="saved_notes">Notes saved!</string>
 </resources>

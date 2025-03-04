@@ -28,4 +28,14 @@
     <string name="no_content">Aucun contenu</string>
     <string name="address">Addresse : </string>
     <string name="phone_number">N°Téléphone : </string>
+    <string name="rate_bakery_btn">Noter la boulangerie</string>
+    <string name="rating_title">Note la boulangerie sur 3 critères</string>
+    <string name="rating_purchase_code">Code d\'achat (6 caractères)</string>
+    <string name="rating_reception_criteria">Réception : </string>
+    <string name="rating_product_criteria">Qualité produit : </string>
+    <string name="rating_decoration_criteria">Décoration : </string>
+    <string name="ok">Ok</string>
+    <string name="cancel">Annuler</string>
+    <string name="error_message_access_code">Le code doit comporter exactement 6 caractères</string>
+    <string name="saved_notes">Notes enregistrées !</string>
 </resources>

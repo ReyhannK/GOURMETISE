@@ -1,9 +1,11 @@
-package com.example.gourmetisemobile
+package com.example.gourmetisemobile.dao
 
 import android.annotation.SuppressLint
 import android.content.ContentValues
 import android.content.Context
 import android.database.sqlite.SQLiteDatabase
+import com.example.gourmetisemobile.GourmetiseHelper
+import com.example.gourmetisemobile.dataclass.Bakery
 
 class BakeryDAO (context : Context) {
     lateinit var DataBase : SQLiteDatabase
@@ -19,11 +21,11 @@ class BakeryDAO (context : Context) {
         v.put("siret", bakery.siret)
         v.put("name", bakery.name)
         v.put("street", bakery.street)
-        v.put("postal_code", bakery.postal_code)
+        v.put("postal_code", bakery.postalCode)
         v.put("city", bakery.city)
-        v.put("telephone_number", bakery.telephone_number)
-        v.put("bakery_description", bakery.bakery_description)
-        v.put("products_decription", bakery.products_decription)
+        v.put("telephone_number", bakery.telephoneNumber)
+        v.put("bakery_description", bakery.bakeryDescription)
+        v.put("products_decription", bakery.productsDecription)
         DataBase.insert("bakery", null, v)
     }
 
@@ -46,11 +48,11 @@ class BakeryDAO (context : Context) {
             bakery.siret = siret
             bakery.name = name
             bakery.street = street
-            bakery.postal_code = postalCode
+            bakery.postalCode = postalCode
             bakery.city = city
-            bakery.telephone_number = telephoneNumber
-            bakery.bakery_description = bakery_description
-            bakery.products_decription = products_decription
+            bakery.telephoneNumber = telephoneNumber
+            bakery.bakeryDescription = bakery_description
+            bakery.productsDecription = products_decription
             bakeries.add(bakery)
             curseur.moveToNext()
         }

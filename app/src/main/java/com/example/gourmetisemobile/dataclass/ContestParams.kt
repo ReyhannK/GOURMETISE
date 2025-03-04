@@ -1,4 +1,4 @@
-package com.example.gourmetisemobile
+package com.example.gourmetisemobile.dataclass
 
 class ContestParams (
     var startRegistration: String? = null,

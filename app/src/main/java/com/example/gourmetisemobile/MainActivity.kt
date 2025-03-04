@@ -2,7 +2,6 @@ package com.example.gourmetisemobile
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
@@ -55,11 +54,15 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.gourmetisemobile.composable.ElementList
+import com.example.gourmetisemobile.dao.BakeryDAO
+import com.example.gourmetisemobile.dao.ContestParamsDAO
+import com.example.gourmetisemobile.dataclass.Bakery
+import com.example.gourmetisemobile.dataclass.ContestParams
 import com.example.gourmetisemobile.ui.theme.GourmetiseMobileTheme
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.Response
-import org.json.JSONArray
 import org.json.JSONObject
 import java.io.IOException
 
@@ -127,11 +130,11 @@ class MainActivity : ComponentActivity() {
                                                             b.siret = jsonObject.getString("siret")
                                                             b.name = jsonObject.getString("name")
                                                             b.street = jsonObject.getString("street")
-                                                            b.postal_code = jsonObject.getString("postal_code");
+                                                            b.postalCode = jsonObject.getString("postal_code");
                                                             b.city = jsonObject.getString("city");
-                                                            b.telephone_number = jsonObject.getString("telephone_number");
-                                                            b.bakery_description = jsonObject.getString("bakery_description");
-                                                            b.products_decription = jsonObject.getString("products_decription");
+                                                            b.telephoneNumber = jsonObject.getString("telephone_number");
+                                                            b.bakeryDescription = jsonObject.getString("bakery_description");
+                                                            b.productsDecription = jsonObject.getString("products_decription");
                                                             bakeryDao.addBakery(b);
                                                         }
                                                         val contestParamsObject  = jsonResponse.getJSONObject("contestParams")
@@ -314,74 +317,6 @@ fun AccueilUI(modifier: Modifier = Modifier, context: Context, bakeries: List<Ba
             ) {
                 items(bakeries) { bakery ->
                     ElementList(bakery = bakery, context)
-                }
-            }
-        }
-    }
-}
-
-@Composable
-fun ElementList(bakery: Bakery, context: Context){
-    Card(
-        modifier = Modifier
-            .padding(16.dp)
-            .fillMaxWidth(),
-        shape = RoundedCornerShape(10.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = Color(0xFFF0F0F0)
-        )
-    ){
-        Column(
-            modifier = Modifier.fillMaxWidth(),
-            verticalArrangement = Arrangement.SpaceBetween
-        ){
-            Row (
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.Top
-            ){
-                Image(
-                    painter = painterResource(R.drawable.logo),
-                    contentDescription = null,
-                    contentScale = ContentScale.Fit,
-                    modifier = Modifier.padding(10.dp),
-                )
-                Text(
-                    text = bakery.name,
-                    modifier = Modifier.padding(20.dp),
-                    fontWeight = FontWeight.Normal
-                )
-            }
-            Text(
-                text = bakery.getFullAdress(),
-                modifier = Modifier.padding(start=10.dp, bottom = 10.dp),
-                fontWeight = FontWeight.Bold
-            )
-            Text(
-                text = bakery.telephone_number,
-                modifier = Modifier.padding(start=10.dp, bottom = 10.dp),
-                fontWeight = FontWeight.Normal
-            )
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.End
-            ){
-                Button(
-                    modifier = Modifier
-                        .height(44.dp)
-                        .padding(5.dp),
-                    shape = RoundedCornerShape(10.dp),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = Color(0xFFD9D9D9),
-                        contentColor = Color.Black
-                    ),
-                    onClick = {
-                        val intent = Intent(context, RatingpPage::class.java).apply {
-                            putExtra("intent_bakery", bakery)
-                        }
-                        context.startActivity(intent)
-                    }
-                ) {
-                    Text(stringResource(R.string.discover_btn))
                 }
             }
         }
