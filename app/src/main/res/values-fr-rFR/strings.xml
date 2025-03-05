@@ -38,4 +38,5 @@
     <string name="cancel">Annuler</string>
     <string name="error_message_access_code">Le code doit comporter exactement 6 caractères</string>
     <string name="saved_notes">Notes enregistrées !</string>
+    <string name="sum_notes">Somme totale des notes</string>
 </resources>

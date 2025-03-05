@@ -18,7 +18,7 @@ class GourmetiseHelper (context : Context)
                 + "telephone_number TEXT NOT NULL,"
                 + "bakery_description TEXT NOT NULL,"
                 + "products_decription TEXT NOT NULL,"
-                + "code_ticket TEXT NOT NULL CHECK(length(code_ticket) = 6),"
+                + "code_ticket TEXT NOT NULL,"
                 + "date_evaluation TEXT NOT NULL);");
 
         db.execSQL("CREATE TABLE criteria ("

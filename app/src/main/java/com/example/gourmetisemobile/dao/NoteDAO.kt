@@ -10,6 +10,11 @@ class NoteDAO(context : Context) {
     lateinit var DataBase : SQLiteDatabase
     lateinit var Helper : GourmetiseHelper
 
+    init {
+        Helper = GourmetiseHelper(context);
+        DataBase = Helper.writableDatabase;
+    }
+
     fun addNote(note: Note) {
         val v = ContentValues()
         v.put("bakery_siret", note.bakerySiret)

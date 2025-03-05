@@ -4,8 +4,13 @@ import android.annotation.SuppressLint
 import android.content.ContentValues
 import android.content.Context
 import android.database.sqlite.SQLiteDatabase
+import android.icu.text.SimpleDateFormat
+import android.icu.util.TimeZone
+import android.util.Log
 import com.example.gourmetisemobile.GourmetiseHelper
 import com.example.gourmetisemobile.dataclass.Bakery
+import java.util.Date
+import java.util.Locale
 
 class BakeryDAO (context : Context) {
     lateinit var DataBase : SQLiteDatabase
@@ -26,13 +31,15 @@ class BakeryDAO (context : Context) {
         v.put("telephone_number", bakery.telephoneNumber)
         v.put("bakery_description", bakery.bakeryDescription)
         v.put("products_decription", bakery.productsDecription)
+        v.put("code_ticket", bakery.codeTicket)
+        v.put("date_evaluation", bakery.dateEvaluation)
         DataBase.insert("bakery", null, v)
     }
 
     @SuppressLint("Range")
     fun getBakeries(): MutableList<Bakery> {
         val bakeries = mutableListOf<Bakery>()
-        val curseur = DataBase.rawQuery("SELECT * from bakery",arrayOf())
+        val curseur = DataBase.rawQuery("SELECT * FROM bakery",arrayOf())
 
         curseur.moveToFirst()
         while (!curseur.isAfterLast()) {
@@ -58,5 +65,48 @@ class BakeryDAO (context : Context) {
         }
         curseur.close()
         return bakeries
+    }
+
+    fun updateBakery(bakery: Bakery, codeTicket: String) {
+
+        val cursor = DataBase.query(
+            "bakery",
+            arrayOf("siret"),
+            "siret = ?",
+            arrayOf(bakery.siret),
+            null, null, null
+        )
+
+        if (cursor.moveToFirst()) {
+            cursor.close()
+
+            val v = ContentValues()
+            v.put("code_ticket", codeTicket)
+            val currentDate = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX", Locale.getDefault()).apply {
+                timeZone = TimeZone.getTimeZone("UTC")
+            }.format(Date())
+            v.put("date_evaluation", currentDate)
+
+            DataBase.update("bakery", v, "siret = ?", arrayOf(bakery.siret))
+        }
+        else {
+            cursor.close()
+            Log.e("SQLITE_ERROR", "Aucune boulangerie trouvée avec ce siret : ${bakery.siret}")
+        }
+    }
+
+    @SuppressLint("Range")
+    fun getSumNotes(bakery: Bakery): Int {
+        var sum = 0
+        val curseur = DataBase.rawQuery("SELECT value FROM note WHERE bakery_siret = ?",arrayOf(bakery.siret))
+
+        curseur.moveToFirst()
+        while (!curseur.isAfterLast()) {
+            val value = curseur.getInt(curseur.getColumnIndex("value"))
+            sum += value
+            curseur.moveToNext()
+        }
+        curseur.close()
+        return sum
     }
 }

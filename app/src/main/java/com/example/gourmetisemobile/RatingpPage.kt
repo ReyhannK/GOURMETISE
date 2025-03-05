@@ -40,7 +40,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -55,7 +55,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.gourmetisemobile.composable.IconWithText
 import com.example.gourmetisemobile.composable.RatingBar
+import com.example.gourmetisemobile.dao.BakeryDAO
+import com.example.gourmetisemobile.dao.NoteDAO
 import com.example.gourmetisemobile.dataclass.Bakery
+import com.example.gourmetisemobile.dataclass.Note
 import com.example.gourmetisemobile.ui.theme.GourmetiseMobileTheme
 
 class RatingpPage : ComponentActivity() {
@@ -67,11 +70,17 @@ class RatingpPage : ComponentActivity() {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                     val context = LocalContext.current
                     val bakery = (context as? Activity)?.intent?.extras?.getParcelable<Bakery>("intent_bakery")
+
+                    val bakeryDao = BakeryDAO(context = context);
+                    val noteDao = NoteDAO(context = context);
+
                     if (bakery != null) {
                         RatingUI(
                             modifier = Modifier.padding(innerPadding),
                             context,
-                            bakery
+                            bakery,
+                            bakeryDao,
+                            noteDao
                         )
                     }
                     else{
@@ -90,7 +99,7 @@ class RatingpPage : ComponentActivity() {
 @SuppressLint("ShowToast")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun RatingUI(modifier: Modifier = Modifier, context: Context, bakery: Bakery) {
+fun RatingUI(modifier: Modifier = Modifier, context: Context, bakery: Bakery, bakeryDAO: BakeryDAO, noteDAO: NoteDAO) {
     val scrollState = rememberScrollState()
     var showBottomSheet by remember { mutableStateOf(false) }
 
@@ -170,9 +179,18 @@ fun RatingUI(modifier: Modifier = Modifier, context: Context, bakery: Bakery) {
         var errorMessage by remember { mutableStateOf<String?>(null) }
 
         var code by remember { mutableStateOf("") }
-        var reception by remember { mutableIntStateOf(1) }
-        var product by remember { mutableIntStateOf(1) }
-        var decoration by remember { mutableIntStateOf(1) }
+
+        val criteriaMap = remember { mutableStateMapOf<String, Int>(
+            "reception" to 1,
+            "product" to 1,
+            "decoration" to 1
+        )}
+
+        val criteriaIds = mapOf(
+            "reception" to 1,
+            "product" to 2,
+            "decoration" to 3
+        )
 
         ModalBottomSheet(
             onDismissRequest = { showBottomSheet = false },
@@ -207,14 +225,17 @@ fun RatingUI(modifier: Modifier = Modifier, context: Context, bakery: Bakery) {
                         modifier = Modifier.padding(top = 8.dp)
                     )
                 }
-                RatingBar(currentRating = reception, title = stringResource(R.string.rating_reception_criteria)) {
-                    newRating -> reception = newRating
+                criteriaMap["reception"]?.let {
+                    RatingBar(currentRating = it, title = stringResource(R.string.rating_reception_criteria)) { newRating -> criteriaMap["reception"] = newRating
+                    }
                 }
-                RatingBar(currentRating = product, title = stringResource(R.string.rating_product_criteria)) {
-                        newRating -> product = newRating
+                criteriaMap["product"]?.let {
+                    RatingBar(currentRating = it, title = stringResource(R.string.rating_product_criteria)) { newRating -> criteriaMap["product"] = newRating
+                    }
                 }
-                RatingBar(currentRating = decoration, title = stringResource(R.string.rating_decoration_criteria)) {
-                        newRating -> decoration = newRating
+                criteriaMap["decoration"]?.let {
+                    RatingBar(currentRating = it, title = stringResource(R.string.rating_decoration_criteria)) { newRating -> criteriaMap["decoration"] = newRating
+                    }
                 }
             }
             Row(
@@ -247,6 +268,17 @@ fun RatingUI(modifier: Modifier = Modifier, context: Context, bakery: Bakery) {
                         if(code.length != 6){
                             errorMessage = "Le code doit comporter exactement 6 caractères"
                         }else{
+                            bakeryDAO.updateBakery(bakery = bakery, codeTicket = code)
+                            criteriaIds.forEach { (key, id) ->
+                                criteriaMap[key]?.let { rating ->
+                                    val note = bakery.siret?.let {
+                                        Note(bakerySiret = it, criteriaId = id, value = rating)
+                                    }
+                                    if (note != null) {
+                                        noteDAO.addNote(note)
+                                    }
+                                }
+                            }
                             showBottomSheet = false
                             errorMessage = null
                             Toast.makeText(context, "Notes enregistrées ! ", Toast.LENGTH_SHORT).show()

@@ -79,6 +79,7 @@ class MainActivity : ComponentActivity() {
                 var messageError by remember { mutableStateOf("") }
                 var bakeries by remember { mutableStateOf(mutableListOf<Bakery>()) }
                 var isImported by remember { mutableStateOf(false) }
+                var searchQuery by remember { mutableStateOf("") }
                 bakeries = bakeryDao.getBakeries()
                 isImported = bakeries.isNotEmpty()
                 Scaffold(
@@ -180,7 +181,7 @@ class MainActivity : ComponentActivity() {
 
                             }
                         }
-                    }
+                    },
                 ) {
                     AccueilUI(
                         modifier = Modifier,
@@ -188,6 +189,7 @@ class MainActivity : ComponentActivity() {
                         bakeries,
                         messageError,
                         onValidate = { value -> messageError = value},
+                        bakeryDao,
                     )
                 }
             }
@@ -197,7 +199,14 @@ class MainActivity : ComponentActivity() {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AccueilUI(modifier: Modifier = Modifier, context: Context, bakeries: List<Bakery>, messageError: String, onValidate: (String) -> Unit) {
+fun AccueilUI(
+    modifier: Modifier = Modifier,
+    context: Context,
+    bakeries: List<Bakery>,
+    messageError: String,
+    onValidate: (String) -> Unit,
+    bakeryDAO: BakeryDAO,
+) {
     val (search, setSearch) = remember { mutableStateOf(TextFieldValue("")) }
     Column(
         modifier = Modifier
@@ -278,8 +287,7 @@ fun AccueilUI(modifier: Modifier = Modifier, context: Context, bakeries: List<Ba
         if(bakeries.isNotEmpty()){
             OutlinedTextField(
                 value = search,
-                onValueChange = {
-                    newValue -> setSearch(newValue)},
+                onValueChange = { newValue -> setSearch(newValue) },
                 singleLine = true,
                 placeholder = {
                     Text(
@@ -316,7 +324,7 @@ fun AccueilUI(modifier: Modifier = Modifier, context: Context, bakeries: List<Ba
                     .padding(bottom = 70.dp)
             ) {
                 items(bakeries) { bakery ->
-                    ElementList(bakery = bakery, context)
+                    ElementList(bakery = bakery, context, bakeryDAO = bakeryDAO)
                 }
             }
         }

@@ -37,4 +37,5 @@
     <string name="cancel">Cancel</string>
     <string name="error_message_access_code">The code must be exactly 6 characters long</string>
     <string name="saved_notes">Notes saved!</string>
+    <string name="sum_notes">Total sum of marks</string>
 </resources>
