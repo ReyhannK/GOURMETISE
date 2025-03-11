@@ -53,7 +53,7 @@
 </template>
   
 <script setup>
-  import axios from 'axios';
+  import api from '@/API/api';
   import { useRouter } from 'vue-router';
   import { ref } from 'vue';
 
@@ -89,11 +89,7 @@
             "role": "participant",
             "password": password.value
         }
-        const response = await axios.post(import.meta.env.VITE_API_URL+"/api/register", newUser, {
-            headers: {
-                'Content-Type': 'application/json',
-            }
-        });
+        const response = await api.post("/api/register", newUser);
 
         message.value = response.data.message;
         token.value = response.data.token;

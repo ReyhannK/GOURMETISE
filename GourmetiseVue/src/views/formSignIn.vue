@@ -155,6 +155,7 @@ import axios from 'axios';
 import { watch } from 'vue';
 import { jwtDecode } from "jwt-decode";
 import { ref } from 'vue'
+import api from "@/API/api.js";
 
 // var remplit par le formulaire
 const siret = ref('');
@@ -311,11 +312,7 @@ async function submit() {
         "email": userEmail
       }
     }
-    const response = await axios.post(import.meta.env.VITE_API_URL + "/api/bakeries", newBakery, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      }
-    });
+    const response = await api.post("/api/bakeries", newBakery);
     modal.value = response.data.message;
   } catch (error) {
     if (error.response && error.response.data.message) {

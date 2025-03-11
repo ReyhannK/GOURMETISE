@@ -12,16 +12,19 @@ const router = createRouter({
             path: '/',
             name: 'home',
             component: Index,
+            meta: { requiresAuth: true }
         },
         {
             path: '/contestParams',
             name: 'contestParams',
             component: ContestParams,
+            meta: { requiresAuth: true }
         },
         {
             path: '/sign-in',
             name: 'Sign-in',
             component: SignInBakery,
+            meta: { requiresAuth: true }
         },
         {
             path: '/create-account',
@@ -34,6 +37,15 @@ const router = createRouter({
             component: Login,
         },
     ],
-})
+});
 
-export default router
+router.beforeEach((to, from, next) => {
+    const token = localStorage.getItem('token');
+    if (to.meta.requiresAuth && !token){
+        next('/login');
+    }else{
+        next();
+    }
+});
+
+export default router;

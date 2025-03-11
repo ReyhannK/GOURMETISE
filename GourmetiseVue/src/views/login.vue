@@ -50,7 +50,7 @@
 </template>
   
 <script setup>
-  import axios from 'axios';
+  import api from '@/API/api';
   import { useRouter } from 'vue-router';
   import { ref } from 'vue';
 
@@ -69,17 +69,14 @@
             "email": email.value,
             "password": password.value
         }
-        const response = await axios.post(import.meta.env.VITE_API_URL+"/api/login", user, {
-            headers: {
-                'Content-Type': 'application/json',
-            }
-        });
+        
+        const response = await api.post("/api/login", user);
 
         message.value = response.data.message;
         token.value = response.data.token;
         
         localStorage.setItem('token', token.value);
-        router.push('/');
+        await router.push('/');
     }catch(error){
         console.log(error.response.data);
         if (error.response && error.response.data.message) {
