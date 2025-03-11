@@ -3,6 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/GourmetiseAPI.iml" filepath="$PROJECT_DIR$/.idea/GourmetiseAPI.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../GourmetiseVue/.idea/GourmetiseVue.iml" filepath="$PROJECT_DIR$/../GourmetiseVue/.idea/GourmetiseVue.iml" />
     </modules>
   </component>
 </project>
