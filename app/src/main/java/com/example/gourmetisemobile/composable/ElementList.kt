@@ -2,6 +2,8 @@ package com.example.gourmetisemobile.composable
 
 import android.content.Context
 import android.content.Intent
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -35,9 +37,16 @@ import com.example.gourmetisemobile.dataclass.Bakery
 import com.example.gourmetisemobile.R
 import com.example.gourmetisemobile.RatingpPage
 import com.example.gourmetisemobile.dao.BakeryDAO
+import com.example.gourmetisemobile.dao.ContestParamsDAO
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun ElementList(bakery: Bakery, context: Context, bakeryDAO: BakeryDAO){
+fun ElementList(
+    bakery: Bakery,
+    context: Context,
+    bakeryDAO: BakeryDAO,
+    contestParamsDAO: ContestParamsDAO
+){
     val sumNotes = bakeryDAO.getSumNotes(bakery)
     Card(
         modifier = Modifier
@@ -107,7 +116,8 @@ fun ElementList(bakery: Bakery, context: Context, bakeryDAO: BakeryDAO){
                                 putExtra("intent_bakery", bakery)
                             }
                             context.startActivity(intent)
-                        }
+                        },
+                        enabled = !contestParamsDAO.isOutsidePeriod()
                     ) {
                         Text(stringResource(R.string.discover_btn))
                     }

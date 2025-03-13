@@ -2,12 +2,14 @@ package com.example.gourmetisemobile
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -190,6 +192,7 @@ class MainActivity : ComponentActivity() {
                         messageError,
                         onValidate = { value -> messageError = value},
                         bakeryDao,
+                        contestParamsDao
                     )
                 }
             }
@@ -197,6 +200,7 @@ class MainActivity : ComponentActivity() {
     }
 }
 
+@RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AccueilUI(
@@ -206,6 +210,7 @@ fun AccueilUI(
     messageError: String,
     onValidate: (String) -> Unit,
     bakeryDAO: BakeryDAO,
+    contestParamsDAO: ContestParamsDAO,
 ) {
     val (search, setSearch) = remember { mutableStateOf(TextFieldValue("")) }
     Column(
@@ -324,7 +329,7 @@ fun AccueilUI(
                     .padding(bottom = 70.dp)
             ) {
                 items(bakeries) { bakery ->
-                    ElementList(bakery = bakery, context, bakeryDAO = bakeryDAO)
+                    ElementList(bakery = bakery, context, bakeryDAO = bakeryDAO, contestParamsDAO)
                 }
             }
         }

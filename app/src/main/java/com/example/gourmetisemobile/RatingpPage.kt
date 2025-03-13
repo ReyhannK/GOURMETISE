@@ -6,6 +6,7 @@ import androidx.compose.ui.res.stringResource
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -56,6 +57,7 @@ import androidx.compose.ui.unit.sp
 import com.example.gourmetisemobile.composable.IconWithText
 import com.example.gourmetisemobile.composable.RatingBar
 import com.example.gourmetisemobile.dao.BakeryDAO
+import com.example.gourmetisemobile.dao.CriteriaDAO
 import com.example.gourmetisemobile.dao.NoteDAO
 import com.example.gourmetisemobile.dataclass.Bakery
 import com.example.gourmetisemobile.dataclass.Note
@@ -73,6 +75,7 @@ class RatingpPage : ComponentActivity() {
 
                     val bakeryDao = BakeryDAO(context = context);
                     val noteDao = NoteDAO(context = context);
+                    val criteriaDAO = CriteriaDAO(context = context);
 
                     if (bakery != null) {
                         RatingUI(
@@ -80,7 +83,8 @@ class RatingpPage : ComponentActivity() {
                             context,
                             bakery,
                             bakeryDao,
-                            noteDao
+                            noteDao,
+                            criteriaDAO
                         )
                     }
                     else{
@@ -99,7 +103,14 @@ class RatingpPage : ComponentActivity() {
 @SuppressLint("ShowToast")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun RatingUI(modifier: Modifier = Modifier, context: Context, bakery: Bakery, bakeryDAO: BakeryDAO, noteDAO: NoteDAO) {
+fun RatingUI(
+    modifier: Modifier = Modifier,
+    context: Context,
+    bakery: Bakery,
+    bakeryDAO: BakeryDAO,
+    noteDAO: NoteDAO,
+    criteriaDAO: CriteriaDAO
+) {
     val scrollState = rememberScrollState()
     var showBottomSheet by remember { mutableStateOf(false) }
 
@@ -180,17 +191,13 @@ fun RatingUI(modifier: Modifier = Modifier, context: Context, bakery: Bakery, ba
 
         var code by remember { mutableStateOf("") }
 
-        val criteriaMap = remember { mutableStateMapOf<String, Int>(
-            "reception" to 1,
-            "product" to 1,
-            "decoration" to 1
-        )}
+        val criteriaMap = criteriaDAO.getAllCriteria()
 
-        val criteriaIds = mapOf(
-            "reception" to 1,
-            "product" to 2,
-            "decoration" to 3
-        )
+        val stateMap = remember { mutableStateMapOf<Int, Pair<String,Int>>().apply {
+            criteriaMap.forEach{ (id,value) ->
+                this[id] = value
+            }
+        } }
 
         ModalBottomSheet(
             onDismissRequest = { showBottomSheet = false },
@@ -225,16 +232,12 @@ fun RatingUI(modifier: Modifier = Modifier, context: Context, bakery: Bakery, ba
                         modifier = Modifier.padding(top = 8.dp)
                     )
                 }
-                criteriaMap["reception"]?.let {
-                    RatingBar(currentRating = it, title = stringResource(R.string.rating_reception_criteria)) { newRating -> criteriaMap["reception"] = newRating
-                    }
-                }
-                criteriaMap["product"]?.let {
-                    RatingBar(currentRating = it, title = stringResource(R.string.rating_product_criteria)) { newRating -> criteriaMap["product"] = newRating
-                    }
-                }
-                criteriaMap["decoration"]?.let {
-                    RatingBar(currentRating = it, title = stringResource(R.string.rating_decoration_criteria)) { newRating -> criteriaMap["decoration"] = newRating
+
+                stateMap.forEach{(id, value) ->
+                    val title = stringResource(R.string.rating_criteria, value.first)
+                        RatingBar(currentRating = value.second, title = title)
+                    {
+                        newRating -> stateMap[id] = value.copy(second = newRating)
                     }
                 }
             }
@@ -268,22 +271,24 @@ fun RatingUI(modifier: Modifier = Modifier, context: Context, bakery: Bakery, ba
                         if(code.length != 6){
                             errorMessage = "Le code doit comporter exactement 6 caractères"
                         }else{
-                            bakeryDAO.updateBakery(bakery = bakery, codeTicket = code)
-                            criteriaIds.forEach { (key, id) ->
-                                criteriaMap[key]?.let { rating ->
-                                    val note = bakery.siret?.let {
-                                        Note(bakerySiret = it, criteriaId = id, value = rating)
-                                    }
+                            if(bakeryDAO.isCodeUse(code)){
+                                errorMessage = "Ce code est déjà utilisé"
+                            }
+                            else{
+                                bakeryDAO.updateBakery(bakery = bakery, codeTicket = code)
+
+                                stateMap.forEach{(id, value) ->
+                                    val note = bakery.siret?.let { Note(bakerySiret = it, criteriaId = id, value = value.second) }
                                     if (note != null) {
                                         noteDAO.addNote(note)
                                     }
                                 }
-                            }
-                            showBottomSheet = false
-                            errorMessage = null
-                            Toast.makeText(context, "Notes enregistrées ! ", Toast.LENGTH_SHORT).show()
+                                showBottomSheet = false
+                                errorMessage = null
+                                Toast.makeText(context, "Notes enregistrées ! ", Toast.LENGTH_SHORT).show()
 
-                            context.startActivity(Intent(context, MainActivity::class.java))
+                                context.startActivity(Intent(context, MainActivity::class.java))
+                            }
                         }
                     }
                 ) {

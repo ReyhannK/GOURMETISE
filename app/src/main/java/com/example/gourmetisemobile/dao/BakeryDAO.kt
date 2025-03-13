@@ -109,4 +109,17 @@ class BakeryDAO (context : Context) {
         curseur.close()
         return sum
     }
+
+    @SuppressLint("Range")
+    fun isCodeUse(code : String): Boolean {
+        var used = false
+        val cursor = DataBase.rawQuery("SELECT code_ticket FROM bakery WHERE code_ticket = ?",arrayOf(code))
+
+        cursor.use{
+            if(it.moveToFirst()){
+                used = true
+            }
+        }
+        return used
+    }
 }

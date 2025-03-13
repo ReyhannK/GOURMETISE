@@ -20,16 +20,19 @@ fun RatingBar(
 ) {
     Row {
         if (title.isNotEmpty()){
-            Text(title)
+            Text(modifier = Modifier.weight(0.3f),
+                text = title)
         }
-        for (i in 1..maxStars) {
-            Icon(
-                imageVector = Icons.Default.Star ,
-                contentDescription = "Note $i",
-                modifier = Modifier
-                    .clickable { onRatingChanged(i) },
-                tint = if (i <= currentRating) Color(0xFFFFD700) else Color.Gray
-            )
+        Row(modifier = Modifier.weight(0.7f)){
+            for (i in 1..maxStars) {
+                Icon(
+                    imageVector = Icons.Default.Star ,
+                    contentDescription = "Note $i",
+                    modifier = Modifier
+                        .clickable { onRatingChanged(i) },
+                    tint = if (i <= currentRating) Color(0xFFFFD700) else Color.Gray
+                )
+            }
         }
     }
 }
