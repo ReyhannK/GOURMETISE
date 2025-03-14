@@ -278,7 +278,7 @@ fun RatingUI(
                                 bakeryDAO.updateBakery(bakery = bakery, codeTicket = code)
 
                                 stateMap.forEach{(id, value) ->
-                                    val note = bakery.siret?.let { Note(bakerySiret = it, criteriaId = id, value = value.second) }
+                                    val note = bakery.siret?.let { Note(bakerySiret = it, criteria_id = id, value = value.second) }
                                     if (note != null) {
                                         noteDAO.addNote(note)
                                     }

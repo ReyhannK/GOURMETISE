@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\BakeryRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
@@ -13,6 +15,7 @@ class Bakery
     #[ORM\Id]
     #[ORM\Column(length: 17)]
     #[Groups(['Bakery:Read'])]
+    #[ORM\GeneratedValue(strategy: 'NONE')]
     private ?string $siret = null;
 
     #[ORM\Column(length: 255)]
@@ -52,6 +55,17 @@ class Bakery
     #[ORM\OneToOne(targetEntity:User::class)]
     #[ORM\JoinColumn(name: 'user_id', referencedColumnName: 'id' , nullable: false, unique: true)]
     private ?User $user = null;
+
+    /**
+     * @var Collection<int, Evaluation>
+     */
+    #[ORM\OneToMany(targetEntity: Evaluation::class, mappedBy: 'bakery', orphanRemoval: true)]
+    private Collection $evaluations;
+
+    public function __construct()
+    {
+        $this->evaluations = new ArrayCollection();
+    }
 
     public function getSiret(): ?string
     {
@@ -181,6 +195,36 @@ class Bakery
     public function setUser(User $user): static
     {
         $this->user = $user;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Evaluation>
+     */
+    public function getEvaluations(): Collection
+    {
+        return $this->evaluations;
+    }
+
+    public function addEvaluation(Evaluation $evaluation): static
+    {
+        if (!$this->evaluations->contains($evaluation)) {
+            $this->evaluations->add($evaluation);
+            $evaluation->setBakery($this);
+        }
+
+        return $this;
+    }
+
+    public function removeEvaluation(Evaluation $evaluation): static
+    {
+        if ($this->evaluations->removeElement($evaluation)) {
+            // set the owning side to null (unless already changed)
+            if ($evaluation->getBakery() === $this) {
+                $evaluation->setBakery(null);
+            }
+        }
 
         return $this;
     }

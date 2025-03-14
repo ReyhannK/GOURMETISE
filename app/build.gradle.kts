@@ -53,6 +53,7 @@ android {
 dependencies {
     implementation ("com.squareup.okhttp3:okhttp:4.10.0")
     implementation ("androidx.compose.material:material-icons-extended:1.5.0")
+    implementation ("com.google.code.gson:gson:2.8.8")
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)

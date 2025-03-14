@@ -59,16 +59,28 @@ import androidx.compose.ui.unit.sp
 import com.example.gourmetisemobile.composable.ElementList
 import com.example.gourmetisemobile.dao.BakeryDAO
 import com.example.gourmetisemobile.dao.ContestParamsDAO
+import com.example.gourmetisemobile.dao.NoteDAO
 import com.example.gourmetisemobile.dataclass.Bakery
 import com.example.gourmetisemobile.dataclass.ContestParams
 import com.example.gourmetisemobile.ui.theme.GourmetiseMobileTheme
+import com.google.gson.ExclusionStrategy
+import com.google.gson.FieldAttributes
+import com.google.gson.GsonBuilder
+import com.google.gson.JsonArray
+import com.google.gson.JsonObject
+import com.google.gson.JsonSerializer
+import okhttp3.Call
+import okhttp3.Callback
+import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.Request
+import okhttp3.RequestBody.Companion.toRequestBody
 import okhttp3.Response
 import org.json.JSONObject
 import java.io.IOException
 
 class MainActivity : ComponentActivity() {
+    @RequiresApi(Build.VERSION_CODES.O)
     @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter", "MutableCollectionMutableState")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -77,8 +89,9 @@ class MainActivity : ComponentActivity() {
             GourmetiseMobileTheme {
                 val context = LocalContext.current
                 val bakeryDao = BakeryDAO(context = context);
+                val noteDAO = NoteDAO(context = context);
                 val contestParamsDao = ContestParamsDAO(context = context);
-                var messageError by remember { mutableStateOf("") }
+                var message by remember { mutableStateOf("") }
                 var bakeries by remember { mutableStateOf(mutableListOf<Bakery>()) }
                 var isImported by remember { mutableStateOf(false) }
                 var searchQuery by remember { mutableStateOf("") }
@@ -154,7 +167,7 @@ class MainActivity : ComponentActivity() {
                                                         bakeries = bakeryDao.getBakeries()
                                                         isImported = true
                                                     } else {
-                                                        messageError = JSONObject(response.body!!.string()).getString("message")
+                                                        message = JSONObject(response.body!!.string()).getString("message")
                                                     }
                                                 }
                                             })
@@ -175,7 +188,9 @@ class MainActivity : ComponentActivity() {
                                             containerColor = Color(0xFFB8B8B8),
                                             contentColor = Color.Black
                                         ),
-                                        onClick = {}
+                                        onClick = {
+                                            exportDatas(noteDAO = noteDAO, bakeryDAO = bakeryDao, context = context)
+                                        }
                                     ) {
                                         Text(stringResource(R.string.export_btn))
                                     }
@@ -189,8 +204,8 @@ class MainActivity : ComponentActivity() {
                         modifier = Modifier,
                         context,
                         bakeries,
-                        messageError,
-                        onValidate = { value -> messageError = value},
+                        message,
+                        onValidate = { value -> message = value},
                         bakeryDao,
                         contestParamsDao
                     )
@@ -207,7 +222,7 @@ fun AccueilUI(
     modifier: Modifier = Modifier,
     context: Context,
     bakeries: List<Bakery>,
-    messageError: String,
+    message: String,
     onValidate: (String) -> Unit,
     bakeryDAO: BakeryDAO,
     contestParamsDAO: ContestParamsDAO,
@@ -271,12 +286,12 @@ fun AccueilUI(
                 )
             }
 
-            if(messageError.isNotEmpty()){
+            if(message.isNotEmpty()){
                 AlertDialog(
                     onDismissRequest = { onValidate("") },
                     title = { Text(text = stringResource(R.string.alert_dialog_error)) },
                     text = {
-                        Text(text = messageError)
+                        Text(text = message)
                     },
                     confirmButton = {
                         Button(onClick = {
@@ -334,4 +349,72 @@ fun AccueilUI(
             }
         }
     }
+}
+
+fun exportDatas(bakeryDAO: BakeryDAO, noteDAO: NoteDAO, context: Context,){
+    val clientHTTP = OkHttpClient()
+
+    val gson = GsonBuilder()
+        .setExclusionStrategies(object : ExclusionStrategy {
+            override fun shouldSkipField(f: FieldAttributes): Boolean {
+                return f.name == "bakeryDescription" || f.name == "city" ||
+                        f.name == "postalCode" || f.name == "productsDecription" ||
+                        f.name == "street" || f.name == "telephoneNumber" || f.name == "name"
+                        || f.name == "bakerySiret"
+            }
+
+            override fun shouldSkipClass(clazz: Class<*>): Boolean {
+                return false
+            }
+        })
+
+        .registerTypeAdapter(Bakery::class.java, JsonSerializer<Bakery> { src, typeOfSrc, context ->
+            val jsonObject = JsonObject()
+
+            jsonObject.addProperty("bakery_siret", src.siret)
+            jsonObject.addProperty("code_ticket", src.codeTicket)
+            jsonObject.addProperty("date_evaluation", src.dateEvaluation)
+
+            val notesArray = JsonArray()
+            src.notes?.forEach { note ->
+                val noteObject = JsonObject()
+                noteObject.addProperty(
+                    "criteria_id",
+                    note.criteria_id
+                )
+                noteObject.addProperty("value", note.value)
+                notesArray.add(noteObject)
+            }
+            jsonObject.add("notes", notesArray)
+
+            jsonObject
+        })
+        .create()
+
+    val json = gson.toJson(bakeryDAO.getBakeryWithNotes(noteDAO = noteDAO))
+    val mediaType = "application/json; charset=utf-8".toMediaType()
+    val body = json.toRequestBody(mediaType)
+
+    val request = Request.Builder()
+        .url("http://10.0.2.2:8000/api/mobile/evaluations")
+        .post(body)
+        .build()
+
+    clientHTTP.newCall(request).enqueue(object : Callback {
+        override fun onResponse(
+            call: Call,
+            response: Response
+        ) {
+            if (response.isSuccessful) {
+                val message = JSONObject(response.body!!.string()).getString("message")
+                println(message)
+            } else {
+                println("Erreur dans la requête: ${response.message}")
+            }
+        }
+
+        override fun onFailure(call: Call, e: IOException) {
+            println("Erreur de réseau: ${e.message}")
+        }
+    })
 }

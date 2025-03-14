@@ -3,12 +3,14 @@ package com.example.gourmetisemobile.dao
 import android.annotation.SuppressLint
 import android.content.ContentValues
 import android.content.Context
+import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
 import android.icu.text.SimpleDateFormat
 import android.icu.util.TimeZone
 import android.util.Log
 import com.example.gourmetisemobile.GourmetiseHelper
 import com.example.gourmetisemobile.dataclass.Bakery
+import com.google.gson.Gson
 import java.util.Date
 import java.util.Locale
 
@@ -121,5 +123,30 @@ class BakeryDAO (context : Context) {
             }
         }
         return used
+    }
+
+    @SuppressLint("Range")
+    fun getBakeryWithNotes(noteDAO: NoteDAO): List<Bakery> {
+        val bakeryList = mutableListOf<Bakery>()
+
+        val bakeryCursor: Cursor = DataBase.rawQuery(
+            "SELECT DISTINCT bakery.* FROM bakery JOIN note ON bakery.siret = note.bakery_siret",
+            null
+        )
+
+        if (bakeryCursor.moveToFirst()) {
+            do {
+                val siret = bakeryCursor.getString(bakeryCursor.getColumnIndex("siret"))
+                val codeTicket = bakeryCursor.getString(bakeryCursor.getColumnIndex("code_ticket"))
+                val dateEvaluation = bakeryCursor.getString(bakeryCursor.getColumnIndex("date_evaluation"))
+
+                val notes = noteDAO.getNotesForBakery(siret)
+
+                bakeryList.add(Bakery(siret= siret, codeTicket= codeTicket, dateEvaluation = dateEvaluation, notes = notes))
+            } while (bakeryCursor.moveToNext())
+        }
+        bakeryCursor.close()
+
+        return bakeryList
     }
 }

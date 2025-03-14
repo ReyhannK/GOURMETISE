@@ -40,9 +40,9 @@ class GourmetiseHelper (context : Context)
                 + "FOREIGN KEY(bakery_siret) REFERENCES bakery(siret),"
                 + "FOREIGN KEY(criteria_id) REFERENCES criteria(id));");
 
-        db.execSQL("INSERT INTO criteria (label) VALUES ('reception');");
-        db.execSQL("INSERT INTO criteria (label) VALUES ('product');");
-        db.execSQL("INSERT INTO criteria (label) VALUES ('decoration');");
+        db.execSQL("INSERT INTO criteria (label) VALUES ('Accueil');");
+        db.execSQL("INSERT INTO criteria (label) VALUES ('Produit');");
+        db.execSQL("INSERT INTO criteria (label) VALUES ('Décoration');");
 
     }
     override fun onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {

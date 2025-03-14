@@ -14,7 +14,8 @@ data class Bakery (
     var bakeryDescription: String="",
     var productsDecription: String="",
     var codeTicket: String = "",
-    var dateEvaluation: String = ""
+    var dateEvaluation: String = "",
+    val notes: List<Note>? = null,
 ): Parcelable{
     fun getFullAdress() : String{
         return this.street + " " + this.postalCode + " " + this.city;
