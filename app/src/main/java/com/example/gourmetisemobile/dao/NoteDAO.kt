@@ -46,4 +46,20 @@ class NoteDAO(context : Context) {
 
         return notesList
     }
+
+    @SuppressLint("Range")
+    fun ratedBakeryNumber(): Int {
+        val query = """
+            SELECT COUNT(DISTINCT n.bakery_siret) AS nombre_boulangeries_avec_notes 
+            FROM note n
+            JOIN bakery b ON n.bakery_siret = b.siret
+        """
+        var nb = 0
+        val cursor = DataBase.rawQuery(query, null)
+        if (cursor.moveToFirst()) {
+            nb = cursor.getInt(cursor.getColumnIndex("nombre_boulangeries_avec_notes"))
+        }
+        cursor.close()
+        return nb
+    }
 }

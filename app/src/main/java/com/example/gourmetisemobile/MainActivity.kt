@@ -63,8 +63,6 @@ import com.example.gourmetisemobile.dao.NoteDAO
 import com.example.gourmetisemobile.dataclass.Bakery
 import com.example.gourmetisemobile.dataclass.ContestParams
 import com.example.gourmetisemobile.ui.theme.GourmetiseMobileTheme
-import com.google.gson.ExclusionStrategy
-import com.google.gson.FieldAttributes
 import com.google.gson.GsonBuilder
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
@@ -81,7 +79,9 @@ import java.io.IOException
 
 class MainActivity : ComponentActivity() {
     @RequiresApi(Build.VERSION_CODES.O)
-    @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter", "MutableCollectionMutableState")
+    @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter", "MutableCollectionMutableState",
+        "StringFormatMatches"
+    )
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -91,12 +91,12 @@ class MainActivity : ComponentActivity() {
                 val bakeryDao = BakeryDAO(context = context);
                 val noteDAO = NoteDAO(context = context);
                 val contestParamsDao = ContestParamsDAO(context = context);
-                var message by remember { mutableStateOf("") }
+                var messageError by remember { mutableStateOf("") }
                 var bakeries by remember { mutableStateOf(mutableListOf<Bakery>()) }
                 var isImported by remember { mutableStateOf(false) }
-                var searchQuery by remember { mutableStateOf("") }
                 bakeries = bakeryDao.getBakeries()
                 isImported = bakeries.isNotEmpty()
+                var isButtonEnabled by remember { mutableStateOf(true) }
                 Scaffold(
                     modifier = Modifier.fillMaxSize(),
                     bottomBar = {
@@ -167,7 +167,7 @@ class MainActivity : ComponentActivity() {
                                                         bakeries = bakeryDao.getBakeries()
                                                         isImported = true
                                                     } else {
-                                                        message = JSONObject(response.body!!.string()).getString("message")
+                                                        messageError = JSONObject(response.body!!.string()).getString("message")
                                                     }
                                                 }
                                             })
@@ -189,8 +189,30 @@ class MainActivity : ComponentActivity() {
                                             contentColor = Color.Black
                                         ),
                                         onClick = {
-                                            exportDatas(noteDAO = noteDAO, bakeryDAO = bakeryDao, context = context)
-                                        }
+                                            exportDatas(
+                                                noteDAO = noteDAO,
+                                                bakeryDAO = bakeryDao,
+                                                contestParamsDAO = contestParamsDao,
+                                                onSubmit = {
+                                                    runOnUiThread {
+                                                        Toast.makeText(context, context.getString(R.string.datas_export_success), Toast.LENGTH_SHORT).show()
+                                                    }
+                                                    isButtonEnabled = false
+                                                },
+                                                onErrorDate = {
+                                                    runOnUiThread {
+                                                        Toast.makeText(context, context.getString(R.string.evaluation_date), Toast.LENGTH_LONG).show()
+                                                    }
+                                                },
+                                                onErrorRate = {
+                                                    newValue ->
+                                                    runOnUiThread {
+                                                        Toast.makeText(context, context.getString(R.string.min_5_notes, newValue), Toast.LENGTH_LONG).show()
+                                                    }
+                                                }
+                                            )
+                                        },
+                                        enabled = isButtonEnabled
                                     ) {
                                         Text(stringResource(R.string.export_btn))
                                     }
@@ -201,11 +223,10 @@ class MainActivity : ComponentActivity() {
                     },
                 ) {
                     AccueilUI(
-                        modifier = Modifier,
                         context,
                         bakeries,
-                        message,
-                        onValidate = { value -> message = value},
+                        messageError,
+                        onValidate = { value -> messageError = value},
                         bakeryDao,
                         contestParamsDao
                     )
@@ -219,15 +240,13 @@ class MainActivity : ComponentActivity() {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AccueilUI(
-    modifier: Modifier = Modifier,
     context: Context,
     bakeries: List<Bakery>,
-    message: String,
+    messageError: String,
     onValidate: (String) -> Unit,
     bakeryDAO: BakeryDAO,
     contestParamsDAO: ContestParamsDAO,
 ) {
-    val (search, setSearch) = remember { mutableStateOf(TextFieldValue("")) }
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -286,12 +305,12 @@ fun AccueilUI(
                 )
             }
 
-            if(message.isNotEmpty()){
+            if(messageError.isNotEmpty()){
                 AlertDialog(
                     onDismissRequest = { onValidate("") },
                     title = { Text(text = stringResource(R.string.alert_dialog_error)) },
                     text = {
-                        Text(text = message)
+                        Text(text = messageError)
                     },
                     confirmButton = {
                         Button(onClick = {
@@ -305,39 +324,6 @@ fun AccueilUI(
         }
 
         if(bakeries.isNotEmpty()){
-            OutlinedTextField(
-                value = search,
-                onValueChange = { newValue -> setSearch(newValue) },
-                singleLine = true,
-                placeholder = {
-                    Text(
-                        stringResource(R.string.search_bakery),
-                        style = TextStyle(fontSize = 15.sp)
-                    )},
-                shape = RoundedCornerShape(20.dp),
-                colors = TextFieldDefaults.outlinedTextFieldColors(
-                    containerColor = Color(0xFFF0F0F0),
-                    focusedBorderColor = Color(0xFFF0F0F0),
-                    unfocusedBorderColor = Color(0xFFF0F0F0),
-                    cursorColor = Color.Gray
-                ),
-                modifier = Modifier
-                    .padding(15.dp)
-                    .fillMaxWidth()
-                    .height(50.dp),
-                trailingIcon = {
-                    IconButton(
-                        onClick = {}
-                    ) {
-                        Icon(
-                            painter = painterResource(R.drawable.magnifying_glass_logo),
-                            contentDescription = null,
-                            modifier = Modifier.size(30.dp)
-                        )
-                    }
-                }
-            )
-
             LazyColumn(
                 modifier = Modifier
                     .fillMaxSize()
@@ -351,23 +337,26 @@ fun AccueilUI(
     }
 }
 
-fun exportDatas(bakeryDAO: BakeryDAO, noteDAO: NoteDAO, context: Context,){
+@RequiresApi(Build.VERSION_CODES.O)
+fun exportDatas(
+    bakeryDAO: BakeryDAO,
+    noteDAO: NoteDAO,
+    contestParamsDAO: ContestParamsDAO,
+    onErrorDate: () -> Unit,
+    onErrorRate: (Int) -> Unit,
+    onSubmit: () -> Unit){
+    if(!contestParamsDAO.isOutsidePeriod()){
+        onErrorDate()
+        return;
+    }
+    val nb = noteDAO.ratedBakeryNumber()
+    if(nb < 5){
+        onErrorRate(nb)
+        return;
+    }
     val clientHTTP = OkHttpClient()
 
     val gson = GsonBuilder()
-        .setExclusionStrategies(object : ExclusionStrategy {
-            override fun shouldSkipField(f: FieldAttributes): Boolean {
-                return f.name == "bakeryDescription" || f.name == "city" ||
-                        f.name == "postalCode" || f.name == "productsDecription" ||
-                        f.name == "street" || f.name == "telephoneNumber" || f.name == "name"
-                        || f.name == "bakerySiret"
-            }
-
-            override fun shouldSkipClass(clazz: Class<*>): Boolean {
-                return false
-            }
-        })
-
         .registerTypeAdapter(Bakery::class.java, JsonSerializer<Bakery> { src, typeOfSrc, context ->
             val jsonObject = JsonObject()
 
@@ -406,8 +395,7 @@ fun exportDatas(bakeryDAO: BakeryDAO, noteDAO: NoteDAO, context: Context,){
             response: Response
         ) {
             if (response.isSuccessful) {
-                val message = JSONObject(response.body!!.string()).getString("message")
-                println(message)
+                onSubmit()
             } else {
                 println("Erreur dans la requête: ${response.message}")
             }

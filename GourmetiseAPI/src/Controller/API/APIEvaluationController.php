@@ -20,8 +20,6 @@ class APIEvaluationController extends AbstractController
     public function sendEvaluations(
         Request $request, 
         EntityManagerInterface $entityManager,
-        SerializerInterface $serializer,
-
     ) : JsonResponse
     {
         $data = json_decode($request->getContent(), true);

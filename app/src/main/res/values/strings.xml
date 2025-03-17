@@ -36,4 +36,7 @@
     <string name="error_message_access_code">The code must be exactly 6 characters long</string>
     <string name="saved_notes">Notes saved!</string>
     <string name="sum_notes">Total sum of marks</string>
+    <string name="datas_export_success">Data exported successfully !</string>
+    <string name="evaluation_date">The end date of the assessments has not been reached</string>
+    <string name="min_5_notes">You must do at least 5 assessments, you currently have %1$s</string>
 </resources>
