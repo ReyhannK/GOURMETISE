@@ -34,12 +34,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[Groups(['User:Read', 'User:Write'])]
     #[ORM\Column(type: "json")]
-    private array $roles = [];
-
-    public function __construct()
-    {
-        $this->roles[] = 'ROLE_USER';
-    }
+    private array $roles = ['ROLE_USER'];
 
     public function getId(): ?int
     {
