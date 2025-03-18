@@ -29,10 +29,27 @@
         </router-link>
       </v-btn>
     </v-row>
+
+    <v-spacer></v-spacer>
+
+    <div class="mr">
+      <v-btn icon @click="logout">
+        <v-icon>mdi-logout</v-icon>
+    </v-btn>
+    </div>
   </v-app-bar>
 </template>
 
 <script setup>
+  import { useRouter } from 'vue-router';
+
+  const router = useRouter();
+
+  const logout = () =>{
+    localStorage.removeItem('token');
+    router.push('/login');
+  };
+  
 </script>
 
 <style scoped>
@@ -47,5 +64,9 @@ a {
 
 img {
   max-height: 65px;
+}
+
+.mr {
+  margin-right: 50px;
 }
 </style>

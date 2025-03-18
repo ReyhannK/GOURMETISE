@@ -37,16 +37,18 @@ class ContestParamsDAO (context : Context) {
 
         val curseur = DataBase.rawQuery("SELECT * FROM contestParams WHERE id = (SELECT MAX(id) FROM contestParams)",arrayOf())
         curseur.moveToFirst()
-        while (!curseur.isAfterLast()) {
+        while (!curseur.isAfterLast) {
             val startRegistration = curseur.getString(curseur.getColumnIndex("startRegistration"))
             val endRegistration = curseur.getString(curseur.getColumnIndex("endRegistration"))
             val startEvaluation = curseur.getString(curseur.getColumnIndex("startEvaluation"))
             val endEvaluation = curseur.getString(curseur.getColumnIndex("endEvaluation"))
+            val isExported = curseur.getInt(curseur.getColumnIndex("isExported"))
 
             contestParams.startRegistration = startRegistration
             contestParams.endRegistration = endRegistration
             contestParams.startEvaluation = startEvaluation
             contestParams.endEvaluation = endEvaluation
+            contestParams.isExported = isExported == 1;
 
             curseur.moveToNext()
         }
@@ -63,5 +65,19 @@ class ContestParamsDAO (context : Context) {
         val currentDateTime = ZonedDateTime.now()
 
         return currentDateTime.isAfter(endEvaluationDate)
+    }
+
+    @SuppressLint("Range")
+    fun exportedDatas(){
+        val curseur = DataBase.rawQuery("SELECT * FROM contestParams WHERE id = (SELECT MAX(id) FROM contestParams)",arrayOf())
+        curseur.moveToFirst()
+        if (curseur.moveToFirst()) {
+            val contentValues = ContentValues().apply {
+                put("isExported", 1)
+            }
+
+            DataBase.update("contestParams", contentValues, "id = ?", arrayOf(curseur.getString(curseur.getColumnIndex("id"))))
+        }
+        curseur.close()
     }
 }

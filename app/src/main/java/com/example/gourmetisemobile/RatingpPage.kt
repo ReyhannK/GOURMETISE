@@ -78,7 +78,6 @@ class RatingpPage : ComponentActivity() {
 
                     if (bakery != null) {
                         RatingUI(
-                            modifier = Modifier.padding(innerPadding),
                             context,
                             bakery,
                             bakeryDao,
@@ -103,7 +102,6 @@ class RatingpPage : ComponentActivity() {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RatingUI(
-    modifier: Modifier = Modifier,
     context: Context,
     bakery: Bakery,
     bakeryDAO: BakeryDAO,

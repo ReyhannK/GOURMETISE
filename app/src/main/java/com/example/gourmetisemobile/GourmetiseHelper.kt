@@ -30,7 +30,8 @@ class GourmetiseHelper (context : Context)
                 + "startRegistration TEXT NOT NULL,"
                 + "endRegistration TEXT NOT NULL,"
                 + "startEvaluation TEXT NOT NULL,"
-                + "endEvaluation TEXT NOT NULL);");
+                + "endEvaluation TEXT NOT NULL,"
+                + "isExported BOOLEAN NOT NULL DEFAULT FALSE);");
 
         db.execSQL("CREATE TABLE note ("
                 + "bakery_siret TEXT NOT NULL,"

@@ -71,6 +71,7 @@
         }
         
         const response = await api.post("/api/login", user);
+        console.log(response.data);
 
         message.value = response.data.message;
         token.value = response.data.token;
@@ -78,7 +79,7 @@
         localStorage.setItem('token', token.value);
         await router.push('/');
     }catch(error){
-        console.log(error.response.data);
+        console.log(error.response);
         if (error.response && error.response.data.message) {
             message.value = error.response.data.message;
         }
