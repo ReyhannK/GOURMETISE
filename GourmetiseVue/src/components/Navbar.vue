@@ -28,6 +28,11 @@
           Afficher résultats
         </router-link>
       </v-btn>
+      <v-btn v-if="manager">
+        <router-link to="/management" class="router-link">
+          Gestion
+        </router-link>
+      </v-btn>
     </v-row>
 
     <v-spacer></v-spacer>
@@ -42,13 +47,32 @@
 
 <script setup>
   import { useRouter } from 'vue-router';
+  import { onBeforeMount, ref } from 'vue';
+  import { jwtDecode } from "jwt-decode";
 
   const router = useRouter();
+
+  const manager = ref();
 
   const logout = () =>{
     localStorage.removeItem('token');
     router.push('/login');
   };
+
+  onBeforeMount(() => {
+    isManager();
+  });
+
+  function isManager()
+  {
+    try{
+        const token = localStorage.getItem('token');
+        let decodedToken = jwtDecode(token);
+        manager.value = decodedToken.roles.includes('ROLE_GERANT');
+    }catch(error){
+        console.log(error)
+    }
+  }
   
 </script>
 

@@ -112,4 +112,11 @@ class APIBakeryController extends AbstractController
             return new JsonResponse(["message" => "Erreur lors de l\'inscription de la boulangerie."], Response::HTTP_CONFLICT);
         }
     }
+
+    #[Route('/api/getRanking', methods :["GET"])]
+  public function getRanking(EntityManagerInterface $entityManager) : JsonResponse
+  {
+      $rankings = $entityManager->getRepository(Bakery::class)->getRanking();
+      return $this->json( ['rankings' => $rankings], Response::HTTP_OK, [], ['groups' => ['Bakery:Read']]);
+  }
 }

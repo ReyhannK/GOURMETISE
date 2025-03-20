@@ -33,7 +33,7 @@ class Note
         return $this->evaluation;
     }
 
-    public function setEvaluation(Evaluation $evaluation): self
+    public function setEvaluation(?Evaluation $evaluation): self
     {
         $this->evaluation = $evaluation;
 

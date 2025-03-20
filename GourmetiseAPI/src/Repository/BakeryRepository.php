@@ -16,6 +16,44 @@ class BakeryRepository extends ServiceEntityRepository
         parent::__construct($registry, Bakery::class);
     }
 
+    /**
+     * Récupère le top 3 des boulangeries basées sur la moyenne des scores des évaluations.
+     *
+     * @return array
+     */
+    public function getRanking()
+    {
+        $sql = "
+            SELECT 
+                bakery.siret AS siret, 
+                bakery.name AS name,
+                AVG(subquery.total_score) AS average_score
+            FROM 
+                bakery
+            JOIN 
+                evaluation ON bakery.siret = evaluation.bakery_siret
+            JOIN 
+                (SELECT 
+                    evaluation_id,
+                    SUM(note.value) AS total_score
+                FROM 
+                    note
+                GROUP BY 
+                    note.evaluation_id) AS subquery ON evaluation.id = subquery.evaluation_id
+            GROUP BY 
+                bakery.siret
+            ORDER BY 
+                average_score DESC
+            LIMIT 3;
+        ";
+
+        $connection = $this->getEntityManager()->getConnection();
+
+        $stmt = $connection->executeQuery($sql);
+    
+        return $stmt->fetchAllAssociative();
+    }
+
     //    /**
     //     * @return Bakery[] Returns an array of Bakery objects
     //     */

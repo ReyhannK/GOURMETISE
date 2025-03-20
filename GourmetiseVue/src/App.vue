@@ -1,15 +1,20 @@
 <script setup>
 import {RouterView} from 'vue-router'
+import { useRoute } from 'vue-router';
+import { computed } from 'vue';
 import Navbar from "@/components/Navbar.vue";
 import Footer from "@/components/Footer.vue";
+
+const route = useRoute();
+
+const isAuthRequired  = computed(() => route.meta.requiresAuth !== false );
 </script>
 
 <template>
   <v-app>
     <v-container class="d-flex flex-column fill-height">
-      <Navbar/>
+      <Navbar v-if="isAuthRequired"/>
 
-      <!-- Contenu de la page selon la route active -->
       <v-main class="flex-grow-1">
         <router-view/>
       </v-main>
