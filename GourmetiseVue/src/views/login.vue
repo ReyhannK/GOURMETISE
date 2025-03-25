@@ -53,14 +53,15 @@
   import api from '@/API/api';
   import { useRouter } from 'vue-router';
   import { ref } from 'vue';
+  import useAuthStore from '@/stores/authStore';
 
   const router = useRouter();
 
+  const authStore = useAuthStore();
+
   const email = ref();
   const password = ref();
-
   const message = ref();
-  const token = ref();
 
   async function submit()
   {
@@ -71,12 +72,12 @@
         }
         
         const response = await api.post("/api/login", user);
-        console.log(response.data);
 
+        const token = response.data.token;
         message.value = response.data.message;
-        token.value = response.data.token;
         
-        localStorage.setItem('token', token.value);
+        authStore.login(token);
+        
         await router.push('/');
     }catch(error){
         console.log(error.response);

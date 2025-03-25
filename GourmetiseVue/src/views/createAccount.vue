@@ -56,15 +56,15 @@
   import api from '@/API/api';
   import { useRouter } from 'vue-router';
   import { ref } from 'vue';
+  import useAuthStore from '@/stores/authStore';
 
   const router = useRouter();
 
+  const authStore = useAuthStore();
+
   const email = ref();
   const password = ref();
-
   const message = ref();
-  const token = ref();
-
   const passwordErrorMessages = ref([]);
 
   const passwordRule = value => {
@@ -86,15 +86,15 @@
     try{
         const newUser = {
             "email": email.value,
-            "role": "participant",
             "password": password.value
         }
         const response = await api.post("/api/register", newUser);
 
         message.value = response.data.message;
-        token.value = response.data.token;
+        const token = response.data.token;
+    
+        authStore.login(token);
         
-        localStorage.setItem('token', token.value);
         router.push('/');
     }catch(error){
         if (error.response && error.response.data.message) {

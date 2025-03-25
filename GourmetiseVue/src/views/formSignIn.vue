@@ -151,10 +151,9 @@
 </template>
 
 <script setup>
-import axios from 'axios';
 import { watch } from 'vue';
 import { jwtDecode } from "jwt-decode";
-import { ref } from 'vue'
+import { ref } from 'vue';
 import api from "@/API/api.js";
 
 // var remplit par le formulaire

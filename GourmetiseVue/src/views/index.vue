@@ -13,7 +13,7 @@
     </v-row>
     <v-row class="text-center" justify="center">
       <v-col cols="12" md="6">
-        <v-card outlined>
+        <v-card v-if="authStore.token && !authStore.manager" outlined>
           <v-card-title class="headline">Participez en tant que boulanger</v-card-title>
           <v-card-text>
             Inscrivez votre boulangerie pour tenter de remporter le titre de la meilleure boulangerie.
@@ -40,7 +40,13 @@
 
 <script setup>
 import { onMounted, ref } from 'vue';
+import { useRoute } from 'vue-router';
+import useAuthStore from '@/stores/authStore';
 import api from "@/API/api.js";
+
+const route = useRoute();
+
+const authStore = useAuthStore();
 
 const params = ref();
 const isOpen = ref('');

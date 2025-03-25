@@ -28,16 +28,12 @@ class APIContestParamsController extends AbstractController
       SerializerInterface $serializer
   ) : JsonResponse
   {
-      // récupérer le contenu JSON de la requête
       $data = $request->getContent();
       try {
-          // désérialiser le JSON en une instance de l'entité ContestParams
           $contestParams = $serializer->deserialize($data, ContestParams::class, 'json', ['groups' => 'ContestParams:Write']);
-          // enregistrer le ContestParams dans la base de données
           $entityManager->persist($contestParams);
           $entityManager->flush();
 
-          // envoyer réponse de succès de la création
           return $this->json('ContestParams created', Response::HTTP_CREATED);
       } 
       catch (\Exception $e) {
@@ -52,21 +48,16 @@ class APIContestParamsController extends AbstractController
         SerializerInterface $serializer
     ) : JsonResponse
     {
-        // trouver le contestParams dans la base de données
         $contestParams = $entityManager->getRepository(ContestParams::class)->find(1);
         if (!$contestParams) {
-            return $this->json('ContestParams not exist', Response::HTTP_NOT_FOUND);
+            return new JsonResponse(["message" => "Paramètres du concours n'existent pas."], Response::HTTP_NOT_FOUND);
         }
-        // récupérer le contenu JSON de la requête
         $data = $request->getContent();
         try {
-            // désérialiser le JSON et mise à jour de l'entité ContestParams
             $serializer->deserialize($data, ContestParams::class, 'json', 
                                      ['object_to_populate' => $contestParams, 'groups' => 'ContestParams:Write']);
-            // enregistrer le concurrent modifié dans la base de données
             $entityManager->flush();
-            // envoyer réponse de succès de la mise à jour
-            return $this->json( 'ContestParams updated', Response::HTTP_OK);
+            return new JsonResponse(["message" => "Paramètres du concours mis à jour."], Response::HTTP_OK);
         }
         catch (\Exception $e) {
             return new JsonResponse(['error' => $e->getMessage()], 
@@ -77,16 +68,12 @@ class APIContestParamsController extends AbstractController
   #[Route('/api/contestParams', methods :["DELETE"])]
     public function deleteContestParams(EntityManagerInterface $entityManager) : JsonResponse
     {
-        // récupère l'entité à supprimer
         $contestParams = $entityManager->getRepository(ContestParams::class)->find(1);
-        // vérifie si l'entité existe
         if (!$contestParams) {
             return $this->json('ContestParams not exist', Response::HTTP_NOT_FOUND);
         }
-        // supprime l'entité de la base de données
         $entityManager->remove($contestParams);
         $entityManager->flush();
-        // retourne une réponse HTTP 204 No Content
         return $this->json(null, Response::HTTP_NO_CONTENT);
     }
 }

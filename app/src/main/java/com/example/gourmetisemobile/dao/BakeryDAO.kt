@@ -130,7 +130,7 @@ class BakeryDAO (context : Context) {
         val bakeryList = mutableListOf<Bakery>()
 
         val bakeryCursor: Cursor = DataBase.rawQuery(
-            "SELECT DISTINCT bakery.* FROM bakery JOIN note ON bakery.siret = note.bakery_siret",
+            "SELECT siret, code_ticket, date_evaluation FROM bakery WHERE date_evaluation != ''",
             null
         )
 

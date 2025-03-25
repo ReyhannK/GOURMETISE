@@ -14,7 +14,7 @@ const router = createRouter({
             path: '/',
             name: 'home',
             component: Index,
-            meta: { requiresAuth: true }
+            meta: { requiresAuth: false }
         },
         {
             path: '/contestParams',

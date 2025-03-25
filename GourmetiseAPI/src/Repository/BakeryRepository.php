@@ -21,8 +21,13 @@ class BakeryRepository extends ServiceEntityRepository
      *
      * @return array
      */
-    public function getRanking()
+    public function getRanking($limit = null)
     {
+        $limitClause = '';
+        if ($limit !== null) {
+            $limitClause = "LIMIT $limit";
+        }   
+
         $sql = "
             SELECT 
                 bakery.siret AS siret, 
@@ -44,7 +49,7 @@ class BakeryRepository extends ServiceEntityRepository
                 bakery.siret
             ORDER BY 
                 average_score DESC
-            LIMIT 3;
+            $limitClause;
         ";
 
         $connection = $this->getEntityManager()->getConnection();

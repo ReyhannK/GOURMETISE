@@ -18,7 +18,7 @@
           Accueil
         </router-link>
       </v-btn>
-      <v-btn>
+      <v-btn v-if="!authStore.manager">
         <router-link to="/sign-in" class="router-link">
           S'inscrire
         </router-link>
@@ -28,7 +28,7 @@
           Afficher résultats
         </router-link>
       </v-btn>
-      <v-btn v-if="manager">
+      <v-btn v-if="authStore.manager">
         <router-link to="/management" class="router-link">
           Gestion
         </router-link>
@@ -36,43 +36,35 @@
     </v-row>
 
     <v-spacer></v-spacer>
-
     <div class="mr">
-      <v-btn icon @click="logout">
+      <v-btn v-if="authStore.token" icon @click="logout">
         <v-icon>mdi-logout</v-icon>
-    </v-btn>
+      </v-btn>
+      <v-btn v-else icon @click="login">
+        <v-icon>mdi-login</v-icon>
+      </v-btn>
     </div>
   </v-app-bar>
 </template>
 
 <script setup>
   import { useRouter } from 'vue-router';
-  import { onBeforeMount, ref } from 'vue';
-  import { jwtDecode } from "jwt-decode";
+  import useAuthStore from '@/stores/authStore';
+  import { ref } from 'vue';
 
   const router = useRouter();
 
-  const manager = ref();
+  const authStore = useAuthStore();
+
+  const manager = ref(false);
 
   const logout = () =>{
-    localStorage.removeItem('token');
-    router.push('/login');
+    authStore.logout();
   };
 
-  onBeforeMount(() => {
-    isManager();
-  });
-
-  function isManager()
-  {
-    try{
-        const token = localStorage.getItem('token');
-        let decodedToken = jwtDecode(token);
-        manager.value = decodedToken.roles.includes('ROLE_GERANT');
-    }catch(error){
-        console.log(error)
-    }
-  }
+  const login = () =>{
+    router.push('/login');
+  };
   
 </script>
 

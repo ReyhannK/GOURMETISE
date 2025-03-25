@@ -377,6 +377,7 @@ fun exportDatas(
         .create()
 
     val json = gson.toJson(bakeryDAO.getBakeryWithNotes(noteDAO = noteDAO))
+    Log.i("test",json.toString())
     val mediaType = "application/json; charset=utf-8".toMediaType()
     val body = json.toRequestBody(mediaType)
 

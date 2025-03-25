@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use App\Repository\ContestParamsRepository;
 use Doctrine\ORM\Mapping as ORM;
+use phpDocumentor\Reflection\Types\Boolean;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: ContestParamsRepository::class)]
@@ -36,6 +37,10 @@ class ContestParams
     #[ORM\Column(type: 'datetime', nullable: false)]
     #[Groups(['ContestParams:Read','ContestParams:Write', 'ContestParams:Mobile'])]
     private ?\DateTimeInterface $endEvaluation = null;
+
+    #[ORM\Column(type: 'boolean', nullable: false)]
+    #[Groups(['ContestParams:Read', 'ContestParams:Write'])]
+    private ?bool $published = false;
 
     public function getId(): ?int
     {
@@ -110,6 +115,18 @@ class ContestParams
     public function setEndEvaluation(\DateTimeInterface $endEvaluation): static
     {
         $this->endEvaluation = $endEvaluation;
+
+        return $this;
+    }
+
+    public function getPublished(): ?bool
+    {
+        return $this->published;
+    }
+
+    public function setPublished(?bool $published): self
+    {
+        $this->published = $published;
 
         return $this;
     }

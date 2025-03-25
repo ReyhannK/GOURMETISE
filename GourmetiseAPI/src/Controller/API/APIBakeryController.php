@@ -113,9 +113,42 @@ class APIBakeryController extends AbstractController
         }
     }
 
-    #[Route('/api/getRanking', methods :["GET"])]
+    #[Route('/api/getRankingTop3', methods :["GET"])]
   public function getRanking(EntityManagerInterface $entityManager) : JsonResponse
   {
+    if((!in_array('ROLE_GERANT', $this->getUser()->getRoles()))){
+        return new JsonResponse(["message" => "Vous n'etes pas autorisé à consulter le classement."], Response::HTTP_BAD_REQUEST);
+    }
+
+    $now = new \DateTimeImmutable();
+    $contestParams = $entityManager->getRepository(ContestParams::class)->findLastContestParams();
+    if(!$contestParams){
+        return new JsonResponse(["message" => "Erreur dans les paramètres du concours."], Response::HTTP_BAD_REQUEST);
+    }
+    if($now < $contestParams->getEndEvaluation()){
+        return new JsonResponse(["message" => "Les évaluations aux concours ne sont pas encore finies."], Response::HTTP_BAD_REQUEST);
+    }
+    
+      $rankings = $entityManager->getRepository(Bakery::class)->getRanking(3);
+      return $this->json( ['rankings' => $rankings], Response::HTTP_OK, [], ['groups' => ['Bakery:Read']]);
+  }
+
+  #[Route('/api/getFullRanking', methods :["GET"])]
+  public function getFullRanking(EntityManagerInterface $entityManager) : JsonResponse
+  {
+    if((!in_array('ROLE_GERANT', $this->getUser()->getRoles()))){
+        return new JsonResponse(["message" => "Vous n'etes pas autorisé à consulter le classement général."], Response::HTTP_BAD_REQUEST);
+    }
+
+    $now = new \DateTimeImmutable();
+    $contestParams = $entityManager->getRepository(ContestParams::class)->findLastContestParams();
+    if(!$contestParams){
+        return new JsonResponse(["message" => "Erreur dans les paramètres du concours."], Response::HTTP_BAD_REQUEST);
+    }
+    if($now < $contestParams->getEndEvaluation()){
+        return new JsonResponse(["message" => "Les évaluations aux concours ne sont pas encore finies."], Response::HTTP_BAD_REQUEST);
+    }
+    
       $rankings = $entityManager->getRepository(Bakery::class)->getRanking();
       return $this->json( ['rankings' => $rankings], Response::HTTP_OK, [], ['groups' => ['Bakery:Read']]);
   }
