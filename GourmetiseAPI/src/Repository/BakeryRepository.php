@@ -17,7 +17,7 @@ class BakeryRepository extends ServiceEntityRepository
     }
 
     /**
-     * Récupère le top 3 des boulangeries basées sur la moyenne des scores des évaluations.
+     * Récupère le classement des boulangeries basées sur la moyenne des scores des évaluations.
      *
      * @return array
      */
@@ -32,19 +32,13 @@ class BakeryRepository extends ServiceEntityRepository
             SELECT 
                 bakery.siret AS siret, 
                 bakery.name AS name,
-                AVG(subquery.total_score) AS average_score
+                AVG(total_scores.total_score) AS average_score
             FROM 
                 bakery
             JOIN 
                 evaluation ON bakery.siret = evaluation.bakery_siret
             JOIN 
-                (SELECT 
-                    evaluation_id,
-                    SUM(note.value) AS total_score
-                FROM 
-                    note
-                GROUP BY 
-                    note.evaluation_id) AS subquery ON evaluation.id = subquery.evaluation_id
+                total_scores ON evaluation.id = total_scores.evaluation_id
             GROUP BY 
                 bakery.siret
             ORDER BY 
@@ -57,6 +51,47 @@ class BakeryRepository extends ServiceEntityRepository
         $stmt = $connection->executeQuery($sql);
     
         return $stmt->fetchAllAssociative();
+    }
+
+    /**
+     * Récupère le rang et score moyen d'une boulangerie
+     *
+     * @return array
+     */
+    public function getMyRank(Bakery $Bakery)
+    {
+        $siret = $Bakery->getSiret();
+
+        $sql = "
+        SELECT 
+            bakery.siret,
+            bakery.name,
+            AVG(total_scores.total_score) AS average_score,
+            RANK() OVER (ORDER BY AVG(total_scores.total_score) DESC) AS rank_value
+        FROM 
+            bakery
+        JOIN 
+            evaluation ON bakery.siret = evaluation.bakery_siret
+        JOIN 
+            total_scores ON evaluation.id = total_scores.evaluation_id
+        GROUP BY 
+            bakery.siret, bakery.name
+        ";
+
+        $connection = $this->getEntityManager()->getConnection();
+
+        $stmt = $connection->executeQuery($sql);
+        $allRankings = $stmt->fetchAllAssociative();
+
+        $myRank = null;
+        foreach ($allRankings as $ranking) {
+            if ($ranking['siret'] === $siret) {
+                $myRank = $ranking;
+                break;
+            }
+        }
+    
+        return $myRank;
     }
 
     //    /**

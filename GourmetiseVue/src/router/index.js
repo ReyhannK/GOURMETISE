@@ -5,7 +5,10 @@ import SignInBakery from "@/views/formSignIn.vue";
 import CreateAccount from "@/views/createAccount.vue";
 import Login from "@/views/login.vue";
 import Management from "@/views/management.vue";
+import Results from "@/views/results.vue";
+import MyBakery from "@/views/myBakery.vue";
 import { jwtDecode } from "jwt-decode";
+import useAuthStore from '@/stores/authStore';
 
 const router = createRouter({
     history: createWebHistory(import.meta.env.BASE_URL),
@@ -20,7 +23,7 @@ const router = createRouter({
             path: '/contestParams',
             name: 'contestParams',
             component: ContestParams,
-            meta: { requiresAuth: true }
+            meta: { requiresAuth: false }
         },
         {
             path: '/sign-in',
@@ -46,22 +49,35 @@ const router = createRouter({
             component: Management,
             meta: { requiresAuth: true, roles: ['ROLE_GERANT'] }
         },
+        {
+            path: '/results',
+            name: 'Results',
+            component: Results,
+            meta: { requiresAuth: false }
+        },
+        {
+            path: '/my-bakery',
+            name: 'MyBakery',
+            component: MyBakery,
+            meta: { requiresAuth: true, roles: ['ROLE_PARTICIPANT'] }
+        },
     ],
 });
 
 router.beforeEach((to, from, next) => {
-    const token = localStorage.getItem('token');
-    if (to.meta.requiresAuth && !token){
+    const authStore = useAuthStore();
+    authStore.checkAuth();   
+    if (to.meta.requiresAuth && !authStore.token){
         next('/login');
     }else{
         if(to.meta.roles){
-            let decodedToken = jwtDecode(token);
+            let decodedToken = jwtDecode(authStore.token);
             if(!decodedToken.roles.some(role => to.meta.roles.includes(role))){
                 next('/');
             }
         }
         next();
-    }
+    };
 });
 
 export default router;

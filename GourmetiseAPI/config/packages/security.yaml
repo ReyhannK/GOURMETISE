@@ -47,6 +47,7 @@ security:
         - { path: ^/api/register, roles: PUBLIC_ACCESS }
         - { path: ^/api/mobile, roles: PUBLIC_ACCESS }
         - { path: ^/api/contestParams, roles: PUBLIC_ACCESS }
+        - { path: ^/api/getRankingTop3, roles: PUBLIC_ACCESS }
         - { path: ^/api, roles: IS_AUTHENTICATED_FULLY }
 
 when@test:

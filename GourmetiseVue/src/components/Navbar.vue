@@ -33,8 +33,12 @@
           Gestion
         </router-link>
       </v-btn>
+      <v-btn v-if="authStore.participant">
+        <router-link to="/my-bakery" class="router-link">
+          Ma Boulangerie
+        </router-link>
+      </v-btn>
     </v-row>
-
     <v-spacer></v-spacer>
     <div class="mr">
       <v-btn v-if="authStore.token" icon @click="logout">
