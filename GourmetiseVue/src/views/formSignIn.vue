@@ -151,12 +151,12 @@
 </template>
 
 <script setup>
+import api from "@/API/api.js";
+import axios from "axios";
 import { watch } from 'vue';
 import { jwtDecode } from "jwt-decode";
 import { ref } from 'vue';
-import api from "@/API/api.js";
 
-// var remplit par le formulaire
 const siret = ref('');
 const name = ref('');
 const street = ref('');
@@ -168,7 +168,6 @@ const bakery_description = ref('');
 const products_decription = ref('');
 const checkbox = ref(false);
 
-// var de gestion des erreurs
 const siretError = ref(false);
 const nameError = ref(false);
 const streetError = ref(false);
@@ -180,14 +179,11 @@ const bakery_descriptionError = ref(false);
 const products_decriptionError = ref(false);
 const checkboxError = ref(false);
 
-//var cities qui stock les villes récupérer depuis l'API communes
 const cities = ref(null);
 
-//var pour les modales d'affichages
 const modal = ref(false);
 const privacy_policy = ref(false);
 
-//surveille le code postal pour récupérer les villes associées
 watch(postal_code, async (new_postal_code) => {
   const regex = /^\d{5}$/;
   const new_postal_code_without_space = new_postal_code.replace(/\s+/g, '');
@@ -204,7 +200,6 @@ watch(postal_code, async (new_postal_code) => {
   }
 });
 
-//Formatage su numéro siret + téléphone
 const siretFormat = () => {
   let siretValue = siret.value.replace(/\s+/g, '');
 
@@ -223,7 +218,6 @@ const telephoneFormat = () => {
   telephone_number.value = telephoneValue;
 };
 
-//Valider les champs de formulaire
 const validSiret = () => {
   const regex = /^\d{14}$/;
   return siretError.value = !siret.value || !regex.test(siret.value.replace(/\s+/g, ''));

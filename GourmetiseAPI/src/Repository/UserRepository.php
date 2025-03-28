@@ -29,25 +29,20 @@ class UserRepository extends ServiceEntityRepository
 
     public function registerUser(User $user): ?string
     {
-        //Hasher le mdp
         $hashedPassword = $this->passwordHasher->hashPassword($user, $user->getPassword());
         $user->setPassword($hashedPassword);
 
-        //Persiste l'utilisateur en bdd
         $entityManager = $this->getEntityManager();
         $entityManager->persist($user);
         $entityManager->flush();
 
-        //Genere un JWT pour l'utilisateur
         return $this->JWTManager->create($user);
     }
 
     public function authenticateUser(User $user, string $plainPassword): ?string
     {
-        //Verifie si le mdp correspond au mdp hashé de l'utilisateur
         if($this->passwordHasher->isPasswordValid($user, $plainPassword))
         {
-            //Genere un JWT pour l'utilisateur
             return $this->JWTManager->create($user);
         }
         return null;

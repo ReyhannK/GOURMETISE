@@ -11,6 +11,7 @@ use App\Entity\User;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Serializer\SerializerInterface;
+use App\Entity\ContestParams;
 
 class APIUserController extends AbstractController
 {
@@ -23,6 +24,19 @@ class APIUserController extends AbstractController
   {
       $data = $request->getContent();
       try {
+          $now = new \DateTimeImmutable();
+          $contestParams = $entityManager->getRepository(ContestParams::class)->findLastContestParams();
+          if(!$contestParams){
+              return new JsonResponse(["message" => "Erreur dans les paramètres du concours."], Response::HTTP_BAD_REQUEST);
+          }
+
+          if($now < $contestParams->getStartRegistration()){
+            return new JsonResponse(["message" => "Les inscriptions au concours ne sont pas encore ouvertes, vous ne pouvez pas vous inscrire."], Response::HTTP_BAD_REQUEST);
+          }
+          if($now>$contestParams->getEndRegistration()){
+              return new JsonResponse(["message" => "Les inscriptions au concours sont fermés, vous ne pouvez plus vous inscrire."], Response::HTTP_BAD_REQUEST);
+          }
+
           $user = $serializer->deserialize($data, User::class, 'json');
           $duplicateUser = $entityManager->getRepository(User::class)->findOneBy(['email' => $user->getEmail()]);
           if($duplicateUser){

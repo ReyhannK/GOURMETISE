@@ -10,7 +10,7 @@
           class="mx-auto"
         />
         <v-container v-if="modal && !loading">
-          <p>{{ modal }}</p>
+          <v-alert type="error" v-if="modal" class="mb-4" :value="true">{{ modal }}</v-alert>
         </v-container>
         <v-container v-if="!loading">
             <v-row align="end" style="height: 150px;" no-gutters>

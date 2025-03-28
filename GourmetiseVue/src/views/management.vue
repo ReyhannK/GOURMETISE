@@ -19,7 +19,7 @@
           <p>Générer le classement du concours afin d'avoir un aperçu du classement
             pour ensuite pouvoir le publier.
           </p>
-          <v-btn color="red" rounded="xs" @click="getResult(); generated = true;">
+          <v-btn color="red" rounded="xs" @click="getResult();">
             Générer
           </v-btn>
         </div>
@@ -98,6 +98,9 @@
       const response = await api.get("/api/getFullRanking");
       ranks.value = response.data.rankings;
       modal.value = response.data.message;
+      if(!generated.value && !published.value){
+        generated.value = true;
+      }
     }catch(error){
       if (error.response && error.response.data.message) {
         modal.value = error.response.data.message;

@@ -17,8 +17,12 @@ class APIContestParamsController extends AbstractController
   #[Route('/api/contestParams', methods :["GET"])]
   public function getContestParams(ContestParamsRepository $repository) : JsonResponse
   {
-      $contestParams = $repository->find(1);
-      return $this->json($contestParams, Response::HTTP_OK, [], ['groups' => ['ContestParams:Read']]);
+      $contestParams = $repository->findLastContestParams();
+      if(!$contestParams)
+      {
+        return new JsonResponse(["message" => "Erreur lors de la récupération des paramètres du concours."], Response::HTTP_BAD_REQUEST);
+      }
+      return $this->json( ['contestParams' => $contestParams], Response::HTTP_OK, [], ['groups' => ['ContestParams:Read']]);
   }
 
   #[Route('/api/contestParams', methods :["POST"])]
