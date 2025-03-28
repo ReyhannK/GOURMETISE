@@ -40,11 +40,8 @@
 
 <script setup>
 import { onMounted, ref } from 'vue';
-import { useRoute } from 'vue-router';
 import useAuthStore from '@/stores/authStore';
 import api from "@/API/api.js";
-
-const route = useRoute();
 
 const authStore = useAuthStore();
 

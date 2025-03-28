@@ -4,7 +4,10 @@ import ContestParams from "@/views/contestParams.vue";
 import SignInBakery from "@/views/formSignIn.vue";
 import CreateAccount from "@/views/createAccount.vue";
 import Login from "@/views/login.vue";
-import Management from "@/views/management.vue";
+import ManagementGenerate from "@/views/management/managementGenerate.vue";
+import ManagementParams from "@/views/management/managementParams.vue";
+import ManagementOverview from "@/views/management/managementOverview.vue";
+import Management from "@/views/management/management.vue";
 import Results from "@/views/results.vue";
 import MyBakery from "@/views/myBakery.vue";
 import { jwtDecode } from "jwt-decode";
@@ -47,7 +50,27 @@ const router = createRouter({
             path: '/management',
             name: 'Management',
             component: Management,
-            meta: { requiresAuth: true, roles: ['ROLE_GERANT'] }
+            meta: { requiresAuth: true, roles: ['ROLE_GERANT'] },
+            children: [
+                {
+                    path: '',
+                    name: 'ManagementOverview',
+                    component: ManagementOverview,
+                    meta: { requiresAuth: true, roles: ['ROLE_GERANT'] }
+                },
+                {
+                    path: 'generate',
+                    name: 'ManagementGenerate',
+                    component: ManagementGenerate,
+                    meta: { requiresAuth: true, roles: ['ROLE_GERANT'] }
+                },
+                {
+                    path: 'params',
+                    name: 'ManagementParams',
+                    component: ManagementParams,
+                    meta: { requiresAuth: true, roles: ['ROLE_GERANT'] }
+                },
+            ],
         },
         {
             path: '/results',

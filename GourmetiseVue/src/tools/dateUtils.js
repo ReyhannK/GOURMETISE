@@ -11,4 +11,4 @@ function formatDate(date) {
     return formattedDate.charAt(0).toUpperCase() + formattedDate.slice(1);
   }
 
-  export default formatDate;
+  export default formatDate ;
