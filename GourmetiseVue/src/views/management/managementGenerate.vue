@@ -81,7 +81,7 @@
   {
     try{
         const response = await api.get("/api/contestParams");
-        published.value = response.data.published;
+        published.value = response.data.contestParams.published;
         if(published.value){
           getResult();
         }

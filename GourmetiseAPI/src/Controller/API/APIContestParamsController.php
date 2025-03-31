@@ -52,7 +52,7 @@ class APIContestParamsController extends AbstractController
         SerializerInterface $serializer
     ) : JsonResponse
     {
-        $contestParams = $entityManager->getRepository(ContestParams::class)->find(1);
+        $contestParams = $entityManager->getRepository(ContestParams::class)->findLastContestParams();
         if (!$contestParams) {
             return new JsonResponse(["message" => "Paramètres du concours n'existent pas."], Response::HTTP_NOT_FOUND);
         }
@@ -72,12 +72,45 @@ class APIContestParamsController extends AbstractController
   #[Route('/api/contestParams', methods :["DELETE"])]
     public function deleteContestParams(EntityManagerInterface $entityManager) : JsonResponse
     {
-        $contestParams = $entityManager->getRepository(ContestParams::class)->find(1);
+        $contestParams = $entityManager->getRepository(ContestParams::class)->findLastContestParams();
         if (!$contestParams) {
             return $this->json('ContestParams not exist', Response::HTTP_NOT_FOUND);
         }
         $entityManager->remove($contestParams);
         $entityManager->flush();
         return $this->json(null, Response::HTTP_NO_CONTENT);
+    }
+
+    #[Route('/api/contestParams/dates', methods :["PATCH"])]
+    public function modifyDates(
+        Request $request, 
+        EntityManagerInterface $entityManager,
+        SerializerInterface $serializer,
+        ) : JsonResponse
+    {
+        $contestParams = $entityManager->getRepository(ContestParams::class)->find(1);
+        if (!$contestParams) {
+            return new JsonResponse(["message" => "Paramètres du concours n'existent pas."], Response::HTTP_NOT_FOUND);
+        }
+        if(new \DateTimeImmutable() >= $contestParams->getStartRegistration()){
+            return new JsonResponse(["message" => "Les inscriptions au concours ont déjà commencé, vous ne pouvez plus les modifier."], Response::HTTP_BAD_REQUEST);
+        }
+        $data = $request->getContent();
+        try {
+            $updatedContestParams  = $serializer->deserialize($data, ContestParams::class, 'json', ['groups' => 'ContestParams:Write']);
+            
+            $contestParams->setStartRegistration($updatedContestParams->getStartRegistration());
+            $contestParams->setEndRegistration($updatedContestParams->getEndRegistration());
+            $contestParams->setStartEvaluation($updatedContestParams->getStartEvaluation());
+            $contestParams->setEndEvaluation($updatedContestParams->getEndEvaluation());
+
+            $entityManager->persist($contestParams);
+            $entityManager->flush();
+  
+            return new JsonResponse(["message" => "Paramètres du concours mis à jour."], Response::HTTP_OK);
+        } 
+        catch (\Exception $e) {
+            return new JsonResponse(["message" => "Erreur dans les paramètres de concours."], Response::HTTP_BAD_REQUEST);
+        }
     }
 }

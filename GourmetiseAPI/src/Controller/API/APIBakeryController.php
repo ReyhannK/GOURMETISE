@@ -93,17 +93,13 @@ class APIBakeryController extends AbstractController
             return new JsonResponse(["message" => "Boulangerie inscrite avec succès ! "], Response::HTTP_CREATED);
         }
         catch (UniqueConstraintViolationException $e) {
-           // echo "Message d'erreur: " . $e->getMessage();  
 
             if (preg_match('/Duplicate entry.*for key \'bakery.PRIMARY\'/', $e->getMessage())) {
-                // Le SIRET est dupliqué
                 return new JsonResponse(["message" => "Numéro de siret déjà existant, cette boulangerie est déjà inscrite."], Response::HTTP_CONFLICT);
             } elseif (preg_match('/Duplicate entry.*for key \'bakery.UNIQ/', $e->getMessage())) {
-                // L'email est dupliqué
                 return new JsonResponse(["message" => "Vous avez déjà inscrit une boulangerie avec ce compte."], Response::HTTP_CONFLICT);
             }
 
-            // Si une violation de contrainte d'unicité inconnue se produit
             return new JsonResponse(["message" => "Cette boulangerie est déjà inscrite ou vous avez déjà inscrite une boulangerie avec ce compte."], Response::HTTP_CONFLICT);
         } 
         catch (\Exception $e) {
