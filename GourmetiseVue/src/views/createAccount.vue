@@ -77,12 +77,16 @@
       passwordErrorMessages.value = ['Le mot de passe doit contenir au moins 10 caractères, une majuscule, une minuscule, un chiffre et un caractère spécial.'];
       return false;
     }
-    passwordErrorMessages.value = [];s
+    passwordErrorMessages.value = [];
     return true;
   };
 
   async function submit()
   {
+    if (passwordErrorMessages.value.length > 0) {
+        message.value = passwordErrorMessages.value;
+      return;
+    }
     try{
         const newUser = {
             "email": email.value,
