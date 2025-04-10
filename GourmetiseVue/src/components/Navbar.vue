@@ -54,13 +54,10 @@
 <script setup>
   import { useRouter } from 'vue-router';
   import useAuthStore from '@/stores/authStore';
-  import { ref } from 'vue';
 
   const router = useRouter();
 
   const authStore = useAuthStore();
-
-  const manager = ref(false);
 
   const logout = () =>{
     authStore.logout();

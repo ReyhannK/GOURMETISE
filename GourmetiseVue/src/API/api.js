@@ -25,8 +25,14 @@ api.interceptors.response.use(
     response => response,
     async error =>{
         if(error.response && error.response.status === 401){
+            if (error.config.url.includes('api/login/refresh')) {
+                localStorage.removeItem('token');
+                //window.location.href = '/login';
+                return Promise.reject(error);
+            }
             try{
-                const refreshResponse = await api.post('/login/refresh');
+                localStorage.clear();
+                const refreshResponse = await api.post('/api/login/refresh');
     
                 api.defaults.headers.common['Authorization'] = `Bearer ${refreshResponse.data.token}`;
                 localStorage.setItem('token', refreshResponse.data.token);
@@ -35,9 +41,9 @@ api.interceptors.response.use(
                 return api(error.config)
     
             } catch(refreshError){
-                console.log('Le refresh token a échoué, déconnexion requise');
+                console.log('Le refresh token a échoué, déconnexion requise', refreshError);
                 localStorage.removeItem('token');
-                window.location.href = '/login';
+                //window.location.href = '/login';
             }
         }
         return Promise.reject(error);

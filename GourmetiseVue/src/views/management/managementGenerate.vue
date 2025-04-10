@@ -119,7 +119,7 @@
       const contestParams = {
       "published": true
     }
-      const response = await api.patch("/api/contestParams", contestParams);
+      const response = await api.patch("/api/updateContestParams", contestParams);
       modal.value = response.data.message;
       published.value = true;
     }catch(error){

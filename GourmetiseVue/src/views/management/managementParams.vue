@@ -25,7 +25,6 @@
                 type="date" 
                 id="startRegistration" 
                 v-model="startRegistration" 
-                :min="minDate"
               />
             </div>
             <div class="date-input-container">
@@ -91,8 +90,6 @@ const startRegistration = ref();
 const endRegistration = ref();
 const startEvaluation = ref();
 const endEvaluation = ref();
-
-const minDate = new Date().toISOString().split("T")[0];
 
 onBeforeMount(() => {
   getContestParams();

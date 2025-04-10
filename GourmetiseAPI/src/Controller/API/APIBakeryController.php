@@ -10,7 +10,6 @@ use Symfony\Component\HttpFoundation\Response;
 use App\Entity\Bakery;
 use App\Entity\ContestParams;
 use App\Entity\User;
-use App\Repository\BakeryRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Serializer\SerializerInterface;
 use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
@@ -113,7 +112,7 @@ class APIBakeryController extends AbstractController
     public function getFullRanking(EntityManagerInterface $entityManager) : JsonResponse
     {
       if((!in_array('ROLE_GERANT', $this->getUser()->getRoles()))){
-          return new JsonResponse(["message" => "Vous n'etes pas autorisé à consulter le classement général."], Response::HTTP_BAD_REQUEST);
+          return new JsonResponse(["message" => "Vous n'etes pas autorisé à consulter le classement général."], Response::HTTP_FORBIDDEN );
       }
   
       $now = new \DateTimeImmutable();
