@@ -98,7 +98,7 @@ class APIContestParamsController extends AbstractController
         if(new \DateTimeImmutable() >= $contestParams->getStartRegistration()){
             return new JsonResponse(["message" => "Les inscriptions au concours ont déjà commencé, vous ne pouvez plus les modifier."], Response::HTTP_BAD_REQUEST);
         }
-        if((!in_array('ROLE_GERANT', $this->getUser()->getRoles()))){
+        if($this->getUser() == null || (!in_array('ROLE_GERANT', $this->getUser()->getRoles()))){
             return new JsonResponse(["message" => "Vous n'etes pas autorisé à consulter modifier les paramètres de concours."], Response::HTTP_FORBIDDEN );
         }
         $data = $request->getContent();
