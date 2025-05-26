@@ -23,7 +23,6 @@ class APIEvaluationController extends AbstractController
     ) : JsonResponse
     {
         $data = json_decode($request->getContent(), true);
-        dd($data);
         try{
             if(count($data) < 5 ){
                 return new JsonResponse(["message" => " Vous avez fait moins de 5 évaluations, vous ne pouvez pas demander l’envoi des évaluations ."], Response::HTTP_BAD_REQUEST);
